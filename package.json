@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Admin panel for peony",
   "type": "module",
-  "main": "dist/server.js",
+  "main": "src/entry.js",
   "scripts": {
     "dev": "INFERNO_ENV=development webpack serve --mode=development --config=webpack.config.js",
     "build": "webpack --mode=production --config=webpack.config.js",
@@ -14,7 +14,8 @@
   "license": "NCSA",
   "dependencies": {
     "inferno": "^8.2.2",
-    "inferno-router": "^8.2.2"
+    "inferno-router": "^8.2.2",
+    "jodit-inferno": "^1.2.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.22.10",
