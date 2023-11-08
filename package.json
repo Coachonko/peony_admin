@@ -1,6 +1,6 @@
 {
   "name": "peony-admin",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "Admin panel for peony",
   "type": "module",
   "main": "src/entry.js",
