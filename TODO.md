@@ -12,3 +12,4 @@
   Why: SEO is not a problem, but it improves the time to first render.
   Blocking: localStorage is not available on first request, only routes that could be rendered on the 
   server are `/login` and NoMatch.
+- Editor should upload images to Garage, needs a gallery extension for showcases of many pictures.

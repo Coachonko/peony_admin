@@ -40,7 +40,7 @@ export default class Post extends Component {
       content: null,
       handle: null,
       excerpt: null,
-      metadata: null
+      metadata: {}
     }
 
     this.updateValue = this.updateValue.bind(this)
@@ -119,6 +119,7 @@ export default class Post extends Component {
     }
   }
 
+  // TODO use await
   resolveGettingPostData () {
     this.gettingPostData.promise
       .then((data) => {
@@ -247,7 +248,7 @@ export default class Post extends Component {
                 name='featured'
                 id='featured'
                 type='checkbox'
-                value={this.state.featured}
+                checked={this.state.featured}
                 onChange={linkEvent(this, handleSettings)}
               />
             </div>
