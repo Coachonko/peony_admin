@@ -29,8 +29,8 @@ export default class Post extends Component {
       updatedBy: null,
       deletedAt: null,
       deletedBy: null,
-      status: 'draft',
       postType: null,
+      status: 'draft',
       featured: false,
       publishedAt: null,
       publishedBy: null,
@@ -40,7 +40,9 @@ export default class Post extends Component {
       content: null,
       handle: null,
       excerpt: null,
-      metadata: {}
+      metadata: {},
+      authors: [],
+      tags: []
     }
 
     this.updateValue = this.updateValue.bind(this)
@@ -119,50 +121,49 @@ export default class Post extends Component {
     }
   }
 
-  // TODO use await
-  resolveGettingPostData () {
-    this.gettingPostData.promise
-      .then((data) => {
-        if (data instanceof Error) {
-          console.error(data)
-          this.setState({ lastError: data })
+  async resolveGettingPostData () {
+    try {
+      const data = await this.gettingPostData.promise
+      if (data instanceof Error) {
+        console.error(data)
+        this.setState({ lastError: data })
+      } else {
+        if (isPeonyError(data)) {
+          this.setState({ peonyError: data })
         } else {
-          if (isPeonyError(data)) {
-            this.setState({ peonyError: data })
-          } else {
-            this.setState({
-              readyForEditing: true,
-              // expected post data
-              id: data.id,
-              createdAt: data.created_at,
-              createdBy: data.created_by,
-              updatedAt: data.updated_at,
-              updatedBy: data.updated_by,
-              deletedAt: data.deleted_at,
-              deletedBy: data.deleted_by,
-              status: data.status,
-              postType: data.post_type,
-              featured: data.featured,
-              publishedAt: data.published_at,
-              publishedBy: data.published_by,
-              visibility: data.visibility,
-              title: data.title,
-              subtitle: data.subtitle,
-              content: data.content,
-              handle: data.handle,
-              excerpt: data.excerpt,
-              metadata: data.metadata,
-              authors: data.authors
-            })
-          }
+          this.setState({
+            readyForEditing: true,
+            // expected post data
+            id: data.id,
+            createdAt: data.created_at,
+            createdBy: data.created_by,
+            updatedAt: data.updated_at,
+            updatedBy: data.updated_by,
+            deletedAt: data.deleted_at,
+            deletedBy: data.deleted_by,
+            status: data.status,
+            postType: data.post_type,
+            featured: data.featured,
+            publishedAt: data.published_at,
+            publishedBy: data.published_by,
+            visibility: data.visibility,
+            title: data.title,
+            subtitle: data.subtitle,
+            content: data.content,
+            handle: data.handle,
+            excerpt: data.excerpt,
+            metadata: data.metadata,
+            authors: data.authors,
+            tags: data.tags
+          })
         }
+      }
+    } catch (error) {
+      console.error(error)
+      this.setState({
+        lastError: error
       })
-      .catch((error) => {
-        console.error(error)
-        this.setState({
-          lastError: error
-        })
-      })
+    }
   }
 
   render () {
@@ -339,7 +340,6 @@ async function handleSave (instance) {
   // TODO add authors
   const {
     status,
-    postType,
     featured,
     visibility,
     title,
@@ -352,7 +352,6 @@ async function handleSave (instance) {
 
   const postData = {
     status,
-    postType,
     featured,
     visibility,
     title,
@@ -363,7 +362,7 @@ async function handleSave (instance) {
     metadata
   }
 
-  const data = await submitPostData(postData)
+  const data = await submitPostData(postData, instance.state.postType)
 
   if (data instanceof Error) {
     console.error(data)
@@ -392,14 +391,18 @@ async function handleSave (instance) {
   }
 }
 
-async function submitPostData (postData) {
+async function submitPostData (postData, postType) {
   const token = getToken()
   const requestHeaders = new Headers()
   requestHeaders.append('Content-Type', 'application/json')
   appendToken(token, requestHeaders)
+  let query = ''
+  if (postType && postType === 'page') {
+    query = '?post_type=page'
+  }
 
   try {
-    const response = await fetch(`${config.PEONY_ADMIN_API}/posts`, {
+    const response = await fetch(`${config.PEONY_ADMIN_API}/posts${query}`, {
       method: 'POST',
       headers: requestHeaders,
       body: JSON.stringify(postData)
