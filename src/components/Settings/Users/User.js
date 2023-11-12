@@ -15,23 +15,16 @@ export default class User extends Component {
       peonyError: null,
       lastError: null,
       isNotAuthorized: false,
-      // User data
-      id: null,
-      handle: null,
-      email: null,
-      role: null,
-      createdAt: null,
-      updatedAt: null,
-      deletedAt: null,
-      firstName: null,
-      lastName: null,
-      metadata: null
+      sortedMetadata: null,
+      userData: null
     }
   }
 
   async componentDidMount () {
-    this.gettingUserData = makeCancelable(this.getUserData())
-    await this.resolveGettingUserData()
+    if (this.props.match.params.id) {
+      this.gettingUserData = makeCancelable(this.getUserData())
+      await this.resolveGettingUserData()
+    }
   }
 
   componentDidUpdate () {
@@ -50,8 +43,8 @@ export default class User extends Component {
 
   async getUserData () {
     let id
-    if (this.state.id) {
-      id = this.state.id
+    if (this.state.userData && this.state.userData.id) {
+      id = this.state.userData.id
     } else {
       id = this.props.match.params.id
     }
@@ -83,24 +76,16 @@ export default class User extends Component {
         if (isPeonyError(data)) {
           this.setState({ peonyError: data })
         } else {
-          let newMetadata
-          if (data.metadata === '') {
-            newMetadata = new Map()
-          } else {
-            const metadataObject = JSON.parse(data.metadata)
-            newMetadata = new Map(Object.entries(metadataObject))
-          }
+          // Transform metadata object to array, store as this.state.sortedMetadata
+          const parsedMetadata = JSON.parse(data.metadata)
+          console.log(parsedMetadata)
+          const metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
           this.setState({
-            id: data.id,
-            handle: data.handle,
-            email: data.email,
-            role: data.role,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
-            deletedAt: data.deletedAt,
-            firstName: data.firstName,
-            lastName: data.lastName,
-            metadata: newMetadata
+            sortedMetadata: metadataArray,
+            userData: {
+              ...data,
+              metadata: parsedMetadata
+            }
           })
         }
       }
@@ -118,29 +103,32 @@ export default class User extends Component {
       )
     }
 
-    if (this.state.id) {
+    if (this.state.userData && this.state.userData.id) {
+      console.log(this.state.sortedMetadata)
       const metadataCell = []
-      for (const [objectKey, objectValue] of this.state.metadata) {
+      for (const item of this.state.sortedMetadata) {
+        const key = Object.keys(item)[0]
+        const value = Object.values(item)[0]
         metadataCell.push(
           <div>
             <input
-              name={objectKey}
+              name={key}
               type='text'
               spellCheck='false'
               autoComplete='off'
-              value={objectKey}
+              value={key}
               onInput={linkEvent(this, handleMetadataKeyChange)}
             />
             <input
-              name={objectKey}
+              name={key}
               type='text'
               spellCheck='false'
               autoComplete='off'
-              value={objectValue}
+              value={value}
               onInput={linkEvent(this, handleMetadataValueChange)}
             />
             <button
-              name={objectKey}
+              name={key}
               type='button'
               onClick={linkEvent(this, handleRemoveMetadataPair)}
             >
@@ -151,7 +139,7 @@ export default class User extends Component {
       }
 
       let deleteButton
-      if (this.state.deletedAt) {
+      if (this.state.userData.deletedAt) {
         deleteButton = (
           <button
             type='button'
@@ -203,7 +191,7 @@ export default class User extends Component {
             <tbody>
               <tr>
                 <th scope='row'>id</th>
-                <td data-cell='id'>{this.state.id}</td>
+                <td data-cell='id'>{this.state.userData.id}</td>
               </tr>
               <tr>
                 <th scope='row'>handle</th>
@@ -213,7 +201,7 @@ export default class User extends Component {
                     type='text'
                     spellCheck='false'
                     autoComplete='off'
-                    value={this.state.handle}
+                    value={this.state.userData.handle}
                     onInput={linkEvent(this, handleInputChange)}
                   />
                 </td>
@@ -226,7 +214,7 @@ export default class User extends Component {
                     type='text'
                     spellCheck='false'
                     autoComplete='off'
-                    value={this.state.email}
+                    value={this.state.userData.email}
                     onInput={linkEvent(this, handleInputChange)}
                   />
                 </td>
@@ -234,19 +222,19 @@ export default class User extends Component {
               <tr>
                 <th scope='row'>role</th>
                 {/* TODO select */}
-                <td>{this.state.role}</td>
+                <td>{this.state.userData.role}</td>
               </tr>
               <tr>
                 <th scope='row'>createdAt</th>
-                <td data-cell='createdAt'>{this.state.createdAt}</td>
+                <td data-cell='createdAt'>{this.state.userData.createdAt}</td>
               </tr>
               <tr>
                 <th scope='row'>updatedAt</th>
-                <td data-cell='updatedAt'>{this.state.updatedAt}</td>
+                <td data-cell='updatedAt'>{this.state.userData.updatedAt}</td>
               </tr>
               <tr>
                 <th scope='row'>deletedAt</th>
-                <td data-cell='deletedAt'>{this.state.deletedAt}</td>
+                <td data-cell='deletedAt'>{this.state.userData.deletedAt}</td>
               </tr>
               <tr>
                 <th scope='row'>firstName</th>
@@ -256,7 +244,7 @@ export default class User extends Component {
                     type='text'
                     spellCheck='true'
                     autoComplete='on'
-                    value={this.state.firstName}
+                    value={this.state.userData.firstName}
                     onInput={linkEvent(this, handleInputChange)}
                   />
                 </td>
@@ -269,7 +257,7 @@ export default class User extends Component {
                     type='text'
                     spellCheck='true'
                     autoComplete='on'
-                    value={this.state.lastName}
+                    value={this.state.userData.lastName}
                     onInput={linkEvent(this, handleInputChange)}
                   />
                 </td>
@@ -300,15 +288,6 @@ async function handleUpdate (instance) {
   instance.setState({ isSubmitting: true })
 
   // TODO show errors to user to require input changes
-  let newMetadata
-  try {
-    newMetadata = JSON.stringify(Object.fromEntries(instance.state.metadata))
-  } catch (error) {
-    instance.setState({
-      lastError: error,
-      isSubmitting: false
-    })
-  }
 
   if (!isValidSlug(instance.state.handle)) {
     const error = new Error('handle is not a slug')
@@ -327,7 +306,9 @@ async function handleUpdate (instance) {
     deletedAt,
     firstName,
     lastName
-  } = instance.state
+  } = instance.state.userData
+
+  const metadataObject = instance.state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
 
   const userData = {
     handle,
@@ -338,10 +319,10 @@ async function handleUpdate (instance) {
     deletedAt,
     firstName,
     lastName,
-    metadata: newMetadata
+    metadata: metadataObject
   }
 
-  const data = await submitUserData(userData, this.state.id)
+  const data = await submitUserData(userData, instance.state.userData.id)
   if (data instanceof Error) {
     console.error(data)
     instance.setState({
@@ -387,47 +368,65 @@ async function submitUserData (userData, userId) {
 function handleAddMetadataPair (instance) {
   const baseKey = 'new key '
   let keyCounter = 1
-  while (instance.state.metadata.has(`${baseKey}${keyCounter}`)) {
+  while (instance.state.sortedMetadata.some(item => Object.keys(item)[0] === `${baseKey}${keyCounter}`)) {
     keyCounter++
   }
 
   const newKey = `${baseKey}${keyCounter}`
 
-  instance.state.metadata.set(newKey, 'new value')
-  instance.setState({ metadata: instance.state.metadata })
+  const updatedMetadata = [...instance.state.sortedMetadata, { [newKey]: 'new value' }]
+
+  instance.setState({ sortedMetadata: updatedMetadata })
 }
 
 function handleRemoveMetadataPair (instance, event) {
-  instance.state.metadata.delete(event.target.name)
-  instance.setState({ metadata: instance.state.metadata })
+  console.log(event.target.name)
+  const updatedMetadata = instance.state.sortedMetadata.filter(item => Object.keys(item)[0] !== event.target.name)
+  instance.setState({ sortedMetadata: updatedMetadata })
 }
 
 function handleMetadataKeyChange (instance, event) {
   const { name, value } = event.target
 
-  if (instance.state.metadata.has(value)) {
-    const error = new Error(`A key with the value ${value} already exists in the metadata map`)
+  if (instance.state.sortedMetadata.some(item => Object.keys(item)[0] === value)) {
+    const error = new Error(`A key named ${value} already exists in metadata`)
     console.log(error)
     instance.setState({ lastError: error })
     return
   }
 
-  instance.state.metadata.set(value, instance.state.metadata.get(name))
-  instance.state.metadata.delete(name)
+  const updatedMetadata = instance.state.sortedMetadata.map(item => {
+    const key = Object.keys(item)[0]
+    if (key === name) {
+      return { [value]: item[key] }
+    }
+    return item
+  })
 
-  instance.setState({ metadata: instance.state.metadata })
+  instance.setState({ sortedMetadata: updatedMetadata })
 }
 
 function handleMetadataValueChange (instance, event) {
   const { name, value } = event.target
 
-  instance.state.metadata.set(name, value)
+  const updatedMetadata = instance.state.sortedMetadata.map(item => {
+    const key = Object.keys(item)[0]
+    if (key === name) {
+      return { [key]: value }
+    }
+    return item
+  })
 
-  instance.setState({ metadata: instance.state.metadata })
+  instance.setState({ sortedMetadata: updatedMetadata })
 }
 
 function handleInputChange (instance, event) {
-  instance.setState({ [event.target.name]: event.target.value })
+  instance.setState({
+    userData: {
+      ...instance.state.userdata,
+      [event.target.name]: event.target.value
+    }
+  })
 }
 
 async function handlePasswordReset (instance) {
@@ -437,7 +436,7 @@ async function handlePasswordReset (instance) {
 async function handleDeleteUser (instance) {
   instance.setState({ isSubmitting: true })
 
-  const data = await deleteUser(this.state.id)
+  const data = await deleteUser(this.state.userData.id)
   if (data instanceof Error) {
     console.error(data)
     instance.setState({
@@ -452,8 +451,11 @@ async function handleDeleteUser (instance) {
       })
     } else {
       instance.setState({
-        updatedAt: data.updatedAt,
-        deletedAt: data.deletedAt,
+        userData: {
+          ...instance.state.userData,
+          updatedAt: data.updatedAt,
+          deletedAt: data.deletedAt
+        },
         hasUpdated: true,
         isSubmitting: false
       })
