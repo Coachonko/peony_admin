@@ -78,7 +78,6 @@ export default class User extends Component {
         } else {
           // Transform metadata object to array, store as this.state.sortedMetadata
           const parsedMetadata = JSON.parse(data.metadata)
-          console.log(parsedMetadata)
           const metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
           this.setState({
             sortedMetadata: metadataArray,
@@ -104,9 +103,9 @@ export default class User extends Component {
     }
 
     if (this.state.userData && this.state.userData.id) {
-      console.log(this.state.sortedMetadata)
       const metadataCell = []
-      for (const item of this.state.sortedMetadata) {
+      for (let i = 0; i < this.state.sortedMetadata.length; i++) {
+        const item = this.state.sortedMetadata[i]
         const key = Object.keys(item)[0]
         const value = Object.values(item)[0]
         metadataCell.push(
@@ -117,20 +116,21 @@ export default class User extends Component {
               spellCheck='false'
               autoComplete='off'
               value={key}
-              onInput={linkEvent(this, handleMetadataKeyChange)}
+              onInput={linkEvent({ instance: this, index: i }, handleMetadataKeyChange)}
+              onFocusOut={linkEvent({ instance: this, index: i }, handleMetadataKeyValidation)}
             />
             <input
-              name={key}
+              name={value}
               type='text'
               spellCheck='false'
               autoComplete='off'
               value={value}
-              onInput={linkEvent(this, handleMetadataValueChange)}
+              onInput={linkEvent({ instance: this, index: i }, handleMetadataValueChange)}
             />
             <button
               name={key}
               type='button'
-              onClick={linkEvent(this, handleRemoveMetadataPair)}
+              onClick={linkEvent({ instance: this, index: i }, handleRemoveMetadataPair)}
             >
               Remove
             </button>
@@ -379,25 +379,22 @@ function handleAddMetadataPair (instance) {
   instance.setState({ sortedMetadata: updatedMetadata })
 }
 
-function handleRemoveMetadataPair (instance, event) {
-  console.log(event.target.name)
-  const updatedMetadata = instance.state.sortedMetadata.filter(item => Object.keys(item)[0] !== event.target.name)
+function handleRemoveMetadataPair ({ instance, index }, event) {
+  const updatedMetadata = instance.state.sortedMetadata.filter((item, i) => i !== index)
   instance.setState({ sortedMetadata: updatedMetadata })
 }
 
-function handleMetadataKeyChange (instance, event) {
-  const { name, value } = event.target
+function handleMetadataKeyChange ({ instance, index }, event) {
+  const { value } = event.target
 
   if (instance.state.sortedMetadata.some(item => Object.keys(item)[0] === value)) {
     const error = new Error(`A key named ${value} already exists in metadata`)
-    console.log(error)
     instance.setState({ lastError: error })
-    return
   }
 
-  const updatedMetadata = instance.state.sortedMetadata.map(item => {
+  const updatedMetadata = instance.state.sortedMetadata.map((item, i) => {
     const key = Object.keys(item)[0]
-    if (key === name) {
+    if (i === index) {
       return { [value]: item[key] }
     }
     return item
@@ -406,12 +403,21 @@ function handleMetadataKeyChange (instance, event) {
   instance.setState({ sortedMetadata: updatedMetadata })
 }
 
-function handleMetadataValueChange (instance, event) {
-  const { name, value } = event.target
+// TODO use this function to display the error in the input field and disable the save button
+function handleMetadataKeyValidation ({ instance, index }, event) {
+  const { value } = event.target
+  if (instance.state.sortedMetadata.some((item, i) => i !== index && Object.keys(item)[0] === value)) {
+    const error = new Error(`A key named ${value} already exists in metadata`)
+    instance.setState({ lastError: error })
+  }
+}
 
-  const updatedMetadata = instance.state.sortedMetadata.map(item => {
+function handleMetadataValueChange ({ instance, index }, event) {
+  const { value } = event.target
+
+  const updatedMetadata = instance.state.sortedMetadata.map((item, i) => {
     const key = Object.keys(item)[0]
-    if (key === name) {
+    if (i === index) {
       return { [key]: value }
     }
     return item
