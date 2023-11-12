@@ -7,6 +7,8 @@ import { makeCancelable } from '../../../utils/promises'
 import { getToken, appendToken, isTokenAvailabile, unsetToken, setLoginFrom } from '../../../utils/auth'
 import { isValidSlug } from '../../../utils/text'
 
+import { Metadata } from '../../shared/Metadata'
+
 export default class User extends Component {
   constructor (props) {
     super(props)
@@ -18,6 +20,9 @@ export default class User extends Component {
       sortedMetadata: null,
       userData: null
     }
+
+    this.updateLastError = this.updateLastError.bind(this)
+    this.updateSortedMetadata = this.updateSortedMetadata.bind(this)
   }
 
   async componentDidMount () {
@@ -94,6 +99,14 @@ export default class User extends Component {
     }
   }
 
+  updateLastError (newLastError) {
+    this.setState({ lastError: newLastError })
+  }
+
+  updateSortedMetadata (newSortedMetadata) {
+    this.setState({ sortedMetadata: newSortedMetadata })
+  }
+
   render () {
     if (this.state.isNotAuthorized === true) {
       setLoginFrom(this.props.location.pathname)
@@ -103,41 +116,6 @@ export default class User extends Component {
     }
 
     if (this.state.userData && this.state.userData.id) {
-      const metadataCell = []
-      for (let i = 0; i < this.state.sortedMetadata.length; i++) {
-        const item = this.state.sortedMetadata[i]
-        const key = Object.keys(item)[0]
-        const value = Object.values(item)[0]
-        metadataCell.push(
-          <div>
-            <input
-              name={key}
-              type='text'
-              spellCheck='false'
-              autoComplete='off'
-              value={key}
-              onInput={linkEvent({ instance: this, index: i }, handleMetadataKeyChange)}
-              onFocusOut={linkEvent({ instance: this, index: i }, handleMetadataKeyValidation)}
-            />
-            <input
-              name={value}
-              type='text'
-              spellCheck='false'
-              autoComplete='off'
-              value={value}
-              onInput={linkEvent({ instance: this, index: i }, handleMetadataValueChange)}
-            />
-            <button
-              name={key}
-              type='button'
-              onClick={linkEvent({ instance: this, index: i }, handleRemoveMetadataPair)}
-            >
-              Remove
-            </button>
-          </div>
-        )
-      }
-
       let deleteButton
       if (this.state.userData.deletedAt) {
         deleteButton = (
@@ -265,15 +243,12 @@ export default class User extends Component {
               <tr>
                 <th scope='row'>metadata</th>
                 <td data-cell='metadata'>
-                  {metadataCell}
-                  <div>
-                    <button
-                      type='button'
-                      onClick={linkEvent(this, handleAddMetadataPair)}
-                    >
-                      Add
-                    </button>
-                  </div>
+                  <Metadata
+                    lastError={this.state.lastError}
+                    updateLastError={this.updateLastError}
+                    sortedMetadata={this.state.sortedMetadata}
+                    updateSortedMetadata={this.updateSortedMetadata}
+                  />
                 </td>
               </tr>
             </tbody>
@@ -363,67 +338,6 @@ async function submitUserData (userData, userId) {
   } catch (error) {
     return error
   }
-}
-
-function handleAddMetadataPair (instance) {
-  const baseKey = 'new key '
-  let keyCounter = 1
-  while (instance.state.sortedMetadata.some(item => Object.keys(item)[0] === `${baseKey}${keyCounter}`)) {
-    keyCounter++
-  }
-
-  const newKey = `${baseKey}${keyCounter}`
-
-  const updatedMetadata = [...instance.state.sortedMetadata, { [newKey]: 'new value' }]
-
-  instance.setState({ sortedMetadata: updatedMetadata })
-}
-
-function handleRemoveMetadataPair ({ instance, index }, event) {
-  const updatedMetadata = instance.state.sortedMetadata.filter((item, i) => i !== index)
-  instance.setState({ sortedMetadata: updatedMetadata })
-}
-
-function handleMetadataKeyChange ({ instance, index }, event) {
-  const { value } = event.target
-
-  if (instance.state.sortedMetadata.some(item => Object.keys(item)[0] === value)) {
-    const error = new Error(`A key named ${value} already exists in metadata`)
-    instance.setState({ lastError: error })
-  }
-
-  const updatedMetadata = instance.state.sortedMetadata.map((item, i) => {
-    const key = Object.keys(item)[0]
-    if (i === index) {
-      return { [value]: item[key] }
-    }
-    return item
-  })
-
-  instance.setState({ sortedMetadata: updatedMetadata })
-}
-
-// TODO use this function to display the error in the input field and disable the save button
-function handleMetadataKeyValidation ({ instance, index }, event) {
-  const { value } = event.target
-  if (instance.state.sortedMetadata.some((item, i) => i !== index && Object.keys(item)[0] === value)) {
-    const error = new Error(`A key named ${value} already exists in metadata`)
-    instance.setState({ lastError: error })
-  }
-}
-
-function handleMetadataValueChange ({ instance, index }, event) {
-  const { value } = event.target
-
-  const updatedMetadata = instance.state.sortedMetadata.map((item, i) => {
-    const key = Object.keys(item)[0]
-    if (i === index) {
-      return { [key]: value }
-    }
-    return item
-  })
-
-  instance.setState({ sortedMetadata: updatedMetadata })
 }
 
 function handleInputChange (instance, event) {
