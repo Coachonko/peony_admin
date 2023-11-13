@@ -90,20 +90,20 @@ function handleMetadataKeyChange ({ updateLastError, sortedMetadata, updateSorte
 }
 
 // TODO use this function to display the error in the input field and disable the save button
-function handleMetadataKeyValidation ({ updateLastError, sortedMetadata, index }, event) {
+function handleMetadataKeyValidation ({ updateLastError, sortedMetadata, i }, event) {
   const { value } = event.target
-  if (sortedMetadata.some((item, i) => i !== index && Object.keys(item)[0] === value)) {
+  if (sortedMetadata.some((item, index) => index !== i && Object.keys(item)[0] === value)) {
     const error = new Error(`A key named ${value} already exists in metadata`)
     updateLastError(error)
   }
 }
 
-function handleMetadataValueChange ({ sortedMetadata, updateSortedMetadata, index }, event) {
+function handleMetadataValueChange ({ sortedMetadata, updateSortedMetadata, i }, event) {
   const { value } = event.target
 
-  const updatedMetadata = sortedMetadata.map((item, i) => {
+  const updatedMetadata = sortedMetadata.map((item, index) => {
     const key = Object.keys(item)[0]
-    if (i === index) {
+    if (index === i) {
       return { [key]: value }
     }
     return item
