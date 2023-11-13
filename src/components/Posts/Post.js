@@ -125,8 +125,16 @@ export default class Post extends Component {
         if (isPeonyError(data)) {
           this.setState({ peonyError: data })
         } else {
-          const parsedMetadata = JSON.parse(data.metadata)
-          const metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
+          let parsedMetadata = {}
+          let metadataArray = []
+          if (data.metadata) {
+            try {
+              parsedMetadata = JSON.parse(data.metadata)
+              metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
+            } catch (error) {
+              this.setState({ lastError: data })
+            }
+          }
           this.setState({
             readyForEditing: true,
             sortedMetadata: metadataArray,

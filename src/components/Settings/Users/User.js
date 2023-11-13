@@ -82,8 +82,16 @@ export default class User extends Component {
           this.setState({ peonyError: data })
         } else {
           // Transform metadata object to array, store as this.state.sortedMetadata
-          const parsedMetadata = JSON.parse(data.metadata)
-          const metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
+          let parsedMetadata = {}
+          let metadataArray = []
+          if (data.metadata) {
+            try {
+              parsedMetadata = JSON.parse(data.metadata)
+              metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
+            } catch (error) {
+              this.setState({ lastError: data })
+            }
+          }
           this.setState({
             sortedMetadata: metadataArray,
             userData: {
