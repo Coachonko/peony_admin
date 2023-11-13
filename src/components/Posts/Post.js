@@ -21,35 +21,21 @@ export default class Post extends Component {
       newPathname: null,
       hasUpdated: false,
       settings: false,
-      // post data
-      id: null,
-      createdAt: null,
-      createdBy: null,
-      updatedAt: null,
-      updatedBy: null,
-      deletedAt: null,
-      deletedBy: null,
-      postType: null,
-      status: 'draft',
-      featured: false,
-      publishedAt: null,
-      publishedBy: null,
-      visibility: 'public',
-      title: null,
-      subtitle: null,
-      content: null,
-      handle: null,
-      excerpt: null,
-      metadata: {},
-      authors: [],
-      tags: []
+      sortedMetadata: null,
+      postData: null
     }
 
-    this.updateValue = this.updateValue.bind(this)
+    this.updateContent = this.updateContent.bind(this)
   }
 
-  updateValue (newValue) {
-    this.setState({ content: newValue })
+  updateContent (newContent) {
+    this.setState({
+      postData:
+      {
+        ...this.state.postData,
+        content: newContent
+      }
+    })
   }
 
   componentDidMount () {
@@ -60,13 +46,19 @@ export default class Post extends Component {
       if (this.props.match.path === '/pages/page') {
         this.setState({
           readyForEditing: true,
-          postType: 'page'
+          postData: {
+            ...this.state.postData,
+            postType: 'page'
+          }
         })
       }
       if (this.props.match.path === '/posts/post') {
         this.setState({
           readyForEditing: true,
-          postType: 'post'
+          postData: {
+            ...this.state.postData,
+            postType: 'post'
+          }
         })
       }
     }
@@ -85,8 +77,7 @@ export default class Post extends Component {
 
       this.setState({
         newPathname: null,
-        isSubmitting: false,
-        readyForEditing: true
+        isSubmitting: false
       })
     }
   }
@@ -99,8 +90,8 @@ export default class Post extends Component {
 
   async getPostData () {
     let id
-    if (this.state.id) {
-      id = this.state.id
+    if (this.state.postData && this.state.postData.id) {
+      id = this.state.postData.id
     } else {
       id = this.props.match.params.id
     }
@@ -132,30 +123,14 @@ export default class Post extends Component {
           this.setState({ peonyError: data })
         } else {
           const parsedMetadata = JSON.parse(data.metadata)
+          const metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
           this.setState({
             readyForEditing: true,
-            // expected post data
-            id: data.id,
-            createdAt: data.created_at,
-            createdBy: data.created_by,
-            updatedAt: data.updated_at,
-            updatedBy: data.updated_by,
-            deletedAt: data.deleted_at,
-            deletedBy: data.deleted_by,
-            status: data.status,
-            postType: data.post_type,
-            featured: data.featured,
-            publishedAt: data.published_at,
-            publishedBy: data.published_by,
-            visibility: data.visibility,
-            title: data.title,
-            subtitle: data.subtitle,
-            content: data.content,
-            handle: data.handle,
-            excerpt: data.excerpt,
-            metadata: parsedMetadata,
-            authors: data.authors,
-            tags: data.tags
+            sortedMetadata: metadataArray,
+            postData: {
+              ...data,
+              metadata: parsedMetadata
+            }
           })
         }
       }
@@ -177,97 +152,97 @@ export default class Post extends Component {
 
     if (this.state.newPathname) {
       return <Redirect to={this.state.newPathname} />
-      // TODO keeps redirecting, doesn't seem to fetch data
-      // Should unset in componentDidUpdate
     }
 
-    let statusButton
-    if (this.props.match.params.id) {
-      statusButton = <button type='button'>Update</button>
+    if (this.state.readyForEditing === true) {
+      let statusButton
+      if (this.props.match.params.id) {
+        statusButton = <button type='button'>Update</button>
       /* TODO update menu: radio button published or unpublished, confirm and cancel buttons */
-    } else {
-      statusButton = <button type='button'>Publish</button>
+      } else {
+        statusButton = <button type='button'>Publish</button>
       /* TODO publish menu: radio buttons publish now or schedule, confirm and delete buttons */
-    }
+      }
 
-    let settingsMenu
-    if (this.state.settings === true) {
-      settingsMenu = (
-        <div className='settings-menu'>
-          <h4>Settings</h4>
-          <form>
-            <div className='form-group'>
-              <label for='title'>title</label>
-              <input
-                name='title'
-                id='title'
-                type='text'
-                spellCheck='true'
-                autoComplete='off'
-                value={this.state.title}
-                onInput={linkEvent(this, handleSettings)}
-              />
-            </div>
-            <div className='form-group'>
-              <label for='subtitle'>subtitle</label>
-              <input
-                name='subtitle'
-                id='subtitle'
-                type='text'
-                spellCheck='true'
-                autoComplete='off'
-                value={this.state.subtitle}
-                onInput={linkEvent(this, handleSettings)}
-              />
-            </div>
-            <div className='form-group'>
-              <label for='excerpt'>excerpt</label>
-              <input
-                name='excerpt'
-                id='excerpt'
-                type='text'
-                spellCheck='true'
-                autoComplete='off'
-                value={this.state.excerpt}
-                onInput={linkEvent(this, handleSettings)}
-              />
-            </div>
-            <div className='form-group'>
-              <label for='handle'>handle</label>
-              <input
-                name='handle'
-                id='handle'
-                type='text'
-                spellCheck='false'
-                autoComplete='off'
-                value={this.state.handle}
-                onInput={linkEvent(this, handleSettings)}
-              />
-            </div>
-            <div className='form-group'>
-              <label for='featured'>featured</label>
-              <input
-                name='featured'
-                id='featured'
-                type='checkbox'
-                checked={this.state.featured}
-                onChange={linkEvent(this, handleSettings)}
-              />
-            </div>
-            <div className='form-group'>
-              {/* TODO make toggle */}
-              <label for='visibility'>visibility</label>
-              <select
-                name='visibility'
-                id='visibility'
-                value={this.state.visibility}
-                onChange={linkEvent(this, handleSettings)}
-              >
-                <option value='public'>public</option>
-                <option value='paid'>paid</option>
-              </select>
-            </div>
-            {/*
+      let settingsMenu
+      if (this.state.settings === true) {
+        const { title, subtitle, excerpt, handle, featured, visibility } = this.state.postData
+        settingsMenu = (
+          <div className='settings-menu'>
+            <h4>Settings</h4>
+            <form>
+              <div className='form-group'>
+                <label for='title'>title</label>
+                <input
+                  name='title'
+                  id='title'
+                  type='text'
+                  spellCheck='true'
+                  autoComplete='off'
+                  value={title}
+                  onInput={linkEvent(this, handleSettings)}
+                />
+              </div>
+              <div className='form-group'>
+                <label for='subtitle'>subtitle</label>
+                <input
+                  name='subtitle'
+                  id='subtitle'
+                  type='text'
+                  spellCheck='true'
+                  autoComplete='off'
+                  value={subtitle}
+                  onInput={linkEvent(this, handleSettings)}
+                />
+              </div>
+              <div className='form-group'>
+                <label for='excerpt'>excerpt</label>
+                <input
+                  name='excerpt'
+                  id='excerpt'
+                  type='text'
+                  spellCheck='true'
+                  autoComplete='off'
+                  value={excerpt}
+                  onInput={linkEvent(this, handleSettings)}
+                />
+              </div>
+              <div className='form-group'>
+                <label for='handle'>handle</label>
+                <input
+                  name='handle'
+                  id='handle'
+                  type='text'
+                  spellCheck='false'
+                  autoComplete='off'
+                  value={handle}
+                  onInput={linkEvent(this, handleSettings)}
+                />
+              </div>
+              <div className='form-group'>
+                <label for='featured'>featured</label>
+                <input
+                  name='featured'
+                  id='featured'
+                  type='checkbox'
+                  checked={featured}
+                  onChange={linkEvent(this, handleSettings)}
+                />
+              </div>
+              <div className='form-group'>
+                {/* TODO make toggle */}
+                <label for='visibility'>visibility</label>
+                <select
+                  name='visibility'
+                  id='visibility'
+                  value={visibility}
+                  onChange={linkEvent(this, handleSettings)}
+                >
+                  <option value='public'>public</option>
+                  <option value='paid'>paid</option>
+                </select>
+              </div>
+              {/*
             TODO insert authors
             require one author, default to current user /admin/auth 'GET'
             accept multiple authors, list of users can be obtained /admin/users 'GET'
@@ -275,61 +250,62 @@ export default class Post extends Component {
             no duplicates
             delete button
             */}
-            {/*
+              {/*
             TODO insert tags
             list of tags can be obtained /admin/tags 'GET'
             store in array to ensure order, allow sorting
             no duplicates
             delete button
             */}
-          </form>
+            </form>
 
+          </div>
+        )
+      }
+
+      let saveHandler
+      if (this.props.match.params.id) {
+        saveHandler = handleUpdate
+      } else {
+        saveHandler = handleSave
+      }
+
+      return (
+        <div className='editor'>
+          <div className='editor-header'>
+            <button
+              type='button'
+              onClick={linkEvent(this, saveHandler)}
+            >
+              save
+            </button>
+            {statusButton}
+            <button
+              className='settings-toggle'
+              title='Settings'
+              type='button'
+              onClick={linkEvent(this, toggleSettings)}
+            >
+              settings
+            </button>
+          </div>
+
+          <JoditWrapper
+            value={this.state.postData.content}
+            updateValue={this.updateContent}
+          />
+
+          {settingsMenu}
         </div>
       )
     }
-
-    let saveHandler
-    if (this.props.match.params.id) {
-      saveHandler = handleUpdate
-    } else {
-      saveHandler = handleSave
-    }
-
-    return (
-      <div className='editor'>
-        <div className='editor-header'>
-          <button
-            type='button'
-            onClick={linkEvent(this, saveHandler)}
-          >
-            save
-          </button>
-          {statusButton}
-          <button
-            className='settings-toggle'
-            title='Settings'
-            type='button'
-            onClick={linkEvent(this, toggleSettings)}
-          >
-            settings
-          </button>
-        </div>
-
-        <JoditWrapper
-          value={this.state.content}
-          updateValue={this.updateValue}
-        />
-
-        {settingsMenu}
-      </div>
-    )
   }
 }
 
 async function handleSave (instance) {
   instance.setState({ isSubmitting: true }) // TODO lock everything until submit complete
 
-  if (!instance.state.title) {
+  if (!instance.state.postData && !instance.state.postData.title) {
     const newError = new Error('missing state.title')
     console.error(newError)
     instance.setState({
@@ -340,7 +316,7 @@ async function handleSave (instance) {
     // TODO display error to user on component update
   }
 
-  if (!instance.state.postType) {
+  if (!instance.state.postData && !instance.state.postData.postType) {
     const newError = new Error('missing state.postType, ensure it is being set in componentDidMount')
     console.error(newError)
     instance.setState({ isSubmitting: false })
@@ -358,11 +334,11 @@ async function handleSave (instance) {
     content,
     handle,
     excerpt
-  } = instance.state
+  } = instance.state.postData
 
   const metadataObject = instance.state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
 
-  const postData = {
+  const postDataToSend = {
     status,
     featured,
     visibility,
@@ -374,7 +350,7 @@ async function handleSave (instance) {
     metadata: metadataObject
   }
 
-  const data = await submitPostData(postData, instance.state.postType)
+  const data = await submitPostData(postDataToSend, instance.state.postData.postType)
 
   if (data instanceof Error) {
     console.error(data)
@@ -396,14 +372,17 @@ async function handleSave (instance) {
         newPathName = `/pages/page/${data.id}`
       }
       instance.setState({
-        id: data.id,
+        postData: {
+          ...instance.state.postData,
+          id: data.id
+        },
         newPathname: newPathName
       })
     }
   }
 }
 
-async function submitPostData (postData, postType) {
+async function submitPostData (postDatatoSend, postType) {
   const token = getToken()
   const requestHeaders = new Headers()
   requestHeaders.append('Content-Type', 'application/json')
@@ -417,7 +396,7 @@ async function submitPostData (postData, postType) {
     const response = await fetch(`${config.PEONY_ADMIN_API}/posts${query}`, {
       method: 'POST',
       headers: requestHeaders,
-      body: JSON.stringify(postData)
+      body: JSON.stringify(postDatatoSend)
     })
     const data = await response.json()
     return data
@@ -429,7 +408,7 @@ async function submitPostData (postData, postType) {
 async function handleUpdate (instance) {
   instance.setState({ isSubmitting: true })
 
-  if (!instance.state.title) {
+  if (!instance.state.postData.title) {
     const newError = new Error('missing state.title')
     console.error(newError)
     instance.setState({
@@ -447,11 +426,12 @@ async function handleUpdate (instance) {
     subtitle,
     content,
     handle,
-    excerpt,
-    metadata
-  } = instance.state
+    excerpt
+  } = instance.state.postData
 
-  const postData = {
+  const metadataObject = instance.state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
+
+  const postDataToSend = {
     status,
     featured,
     visibility,
@@ -460,10 +440,10 @@ async function handleUpdate (instance) {
     content,
     handle,
     excerpt,
-    metadata
+    metadata: metadataObject
   }
 
-  const data = await updatePostData(postData, instance.state.id)
+  const data = await updatePostData(postDataToSend, instance.state.id)
 
   if (data instanceof Error) {
     console.error(data)
@@ -486,7 +466,7 @@ async function handleUpdate (instance) {
   }
 }
 
-async function updatePostData (postData, id) {
+async function updatePostData (postDataToSend, id) {
   const token = getToken()
   const requestHeaders = new Headers()
   requestHeaders.append('Content-Type', 'application/json')
@@ -496,7 +476,7 @@ async function updatePostData (postData, id) {
     const response = await fetch(`${config.PEONY_ADMIN_API}/posts/${id}`, {
       method: 'POST',
       headers: requestHeaders,
-      body: JSON.stringify(postData)
+      body: JSON.stringify(postDataToSend)
     })
     const data = await response.json()
     return data
@@ -513,8 +493,18 @@ function handleSettings (instance, event) {
   const { name, value, checked, type } = event.target
 
   if (type === 'checkbox') {
-    instance.setState({ [name]: checked })
+    instance.setState({
+      postData: {
+        ...instance.state.postData,
+        [name]: checked
+      }
+    })
   } else {
-    instance.setState({ [name]: value })
+    instance.setState({
+      postData: {
+        ...instance.state.postData,
+        [name]: value
+      }
+    })
   }
 }
