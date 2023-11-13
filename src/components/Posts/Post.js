@@ -6,6 +6,7 @@ import { getToken, isTokenAvailabile, unsetToken, appendToken, setLoginFrom } fr
 import { isPeonyError } from '../../utils/peony'
 import { makeCancelable } from '../../utils/promises'
 
+import { Metadata } from '../shared/Metadata'
 import { JoditWrapper } from './JoditWrapper'
 
 export default class Post extends Component {
@@ -25,6 +26,8 @@ export default class Post extends Component {
       postData: null
     }
 
+    this.updateLastError = this.updateLastError.bind(this)
+    this.updateSortedMetadata = this.updateSortedMetadata.bind(this)
     this.updateContent = this.updateContent.bind(this)
   }
 
@@ -142,6 +145,14 @@ export default class Post extends Component {
     }
   }
 
+  updateLastError (newLastError) {
+    this.setState({ lastError: newLastError })
+  }
+
+  updateSortedMetadata (newSortedMetadata) {
+    this.setState({ sortedMetadata: newSortedMetadata })
+  }
+
   render () {
     if (this.state.isNotAuthorized === true) {
       setLoginFrom(this.props.location.pathname)
@@ -257,8 +268,16 @@ export default class Post extends Component {
             no duplicates
             delete button
             */}
+              <div className='form-group'>
+                <label for='metadata'>metadata</label>
+                <Metadata
+                  lastError={this.state.lastError}
+                  updateLastError={this.updateLastError}
+                  sortedMetadata={this.state.sortedMetadata}
+                  updateSortedMetadata={this.updateSortedMetadata}
+                />
+              </div>
             </form>
-
           </div>
         )
       }
@@ -443,7 +462,7 @@ async function handleUpdate (instance) {
     metadata: metadataObject
   }
 
-  const data = await updatePostData(postDataToSend, instance.state.id)
+  const data = await updatePostData(postDataToSend, instance.state.postData.id)
 
   if (data instanceof Error) {
     console.error(data)
