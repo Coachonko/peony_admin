@@ -131,6 +131,7 @@ export default class Post extends Component {
         if (isPeonyError(data)) {
           this.setState({ peonyError: data })
         } else {
+          const parsedMetadata = JSON.parse(data.metadata)
           this.setState({
             readyForEditing: true,
             // expected post data
@@ -152,7 +153,7 @@ export default class Post extends Component {
             content: data.content,
             handle: data.handle,
             excerpt: data.excerpt,
-            metadata: data.metadata,
+            metadata: parsedMetadata,
             authors: data.authors,
             tags: data.tags
           })
@@ -266,14 +267,23 @@ export default class Post extends Component {
                 <option value='paid'>paid</option>
               </select>
             </div>
+            {/*
+            TODO insert authors
+            require one author, default to current user /admin/auth 'GET'
+            accept multiple authors, list of users can be obtained /admin/users 'GET'
+            store in array to ensure order, allow sorting
+            no duplicates
+            delete button
+            */}
+            {/*
+            TODO insert tags
+            list of tags can be obtained /admin/tags 'GET'
+            store in array to ensure order, allow sorting
+            no duplicates
+            delete button
+            */}
           </form>
-          {/* TODO
-        tags: []string
-        authors: []id
-        metadata: text
-        save on input
-        delete button
-      */}
+
         </div>
       )
     }
@@ -337,7 +347,8 @@ async function handleSave (instance) {
     return
   }
 
-  // TODO add authors
+  // TODO add author_id(s)
+  // TODO add tag_id(s)
   const {
     status,
     featured,
@@ -346,9 +357,10 @@ async function handleSave (instance) {
     subtitle,
     content,
     handle,
-    excerpt,
-    metadata
+    excerpt
   } = instance.state
+
+  const metadataObject = instance.state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
 
   const postData = {
     status,
@@ -359,7 +371,7 @@ async function handleSave (instance) {
     content,
     handle,
     excerpt,
-    metadata
+    metadata: metadataObject
   }
 
   const data = await submitPostData(postData, instance.state.postType)
