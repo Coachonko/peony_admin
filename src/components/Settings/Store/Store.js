@@ -3,6 +3,9 @@ import { Component } from 'inferno'
 import { config } from '../../../../config'
 import { appendToken, getToken } from '../../../utils/auth'
 import { makeCancelable } from '../../../utils/promises'
+import { isPeonyError } from '../../../utils/peony'
+
+import { Metadata } from '../../shared/Metadata'
 
 export default class Store extends Component {
   constructor (props) {
@@ -11,12 +14,25 @@ export default class Store extends Component {
     this.state = {
       storeData: null,
       errorStatus: null,
-      errorBody: null
+      errorBody: null,
+      sortedMetadata: null
     }
+
+    this.updateLastError = this.updateLastError.bind(this)
+    this.updateSortedMetadata = this.updateSortedMetadata.bind(this)
   }
 
-  componentDidMount () {
-    this.gettingStoreData = makeCancelable(getStoreData(this))
+  updateLastError (newLastError) {
+    this.setState({ lastError: newLastError })
+  }
+
+  updateSortedMetadata (newSortedMetadata) {
+    this.setState({ sortedMetadata: newSortedMetadata })
+  }
+
+  async componentDidMount () {
+    this.gettingStoreData = makeCancelable(this.getStoreData())
+    await this.resolveGettingStoreData()
   }
 
   componentWillUnmount () {
@@ -25,44 +41,86 @@ export default class Store extends Component {
     }
   }
 
+  async getStoreData () {
+    const token = getToken()
+    const requestHeaders = new Headers()
+    appendToken(token, requestHeaders)
+
+    try {
+      const response = await fetch(`${config.PEONY_ADMIN_API}/store`, {
+        method: 'GET',
+        headers: requestHeaders
+      })
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      return error
+    }
+  }
+
+  async resolveGettingStoreData () {
+    try {
+      const data = await this.gettingStoreData.promise
+      if (data instanceof Error) {
+        console.error(data)
+        this.setState({ lastError: data })
+      } else {
+        if (isPeonyError(data)) {
+          this.setState({ peonyError: data })
+        } else {
+          let parsedMetadata = {}
+          let metadataArray = []
+          if (data.metadata) {
+            try {
+              parsedMetadata = JSON.parse(data.metadata)
+              metadataArray = Object.entries(parsedMetadata).map(([key, value]) => ({ [key]: value }))
+            } catch (error) {
+              this.setState({ lastError: data })
+            }
+          }
+          this.setState({
+            sortedMetadata: metadataArray,
+            storeData: {
+              ...data,
+              metadata: parsedMetadata
+            }
+          })
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      this.setState({
+        lastError: error
+      })
+    }
+  }
+
   render (props) {
     if (this.state.storeData) {
       return (
         <div>
           <h2>Store</h2>
-          <Table data={this.state.storeData} />
+          <Table data={this.state.storeData}>
+            <tr>
+              <th scope='row'>metadata</th>
+              <td data-cell='metadata'>
+                <Metadata
+                  lastError={this.state.lastError}
+                  updateLastError={this.updateLastError}
+                  sortedMetadata={this.state.sortedMetadata}
+                  updateSortedMetadata={this.updateSortedMetadata}
+                />
+              </td>
+            </tr>
+          </Table>
         </div>
       )
     }
   }
 }
 
-async function getStoreData (instance) {
-  const token = getToken()
-  const requestHeaders = new Headers()
-  appendToken(token, requestHeaders)
-
-  try {
-    const response = await fetch(`${config.PEONY_ADMIN_API}/store`, {
-      method: 'GET',
-      headers: requestHeaders
-    })
-
-    const data = await response.json()
-    if (!response.ok) {
-      instance.setState({
-        errorStatus: response.status,
-        errorBody: data
-      })
-    } else {
-      instance.setState({ storeData: data })
-    }
-  } catch (error) {
-    console.error('Fetch error: ', error)
-  }
-}
-
-function Table ({ data }) {
+function Table ({ data, children }) {
   return (
     <table>
       <caption>
@@ -114,10 +172,8 @@ function Table ({ data }) {
           <th scope='row'>defaultSalesChannelId</th>
           <td data-cell='defaultSalesChannelId'>{data.defaultSalesChannelId}</td>
         </tr>
-        <tr>
-          <th scope='row'>metadata</th>
-          <td data-cell='metadata'>{data.metadata}</td>
-        </tr>
+        {children}
+
       </tbody>
 
     </table>
