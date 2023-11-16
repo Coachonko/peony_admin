@@ -1,5 +1,5 @@
 import { Component, linkEvent } from 'inferno'
-import { Redirect, Link } from 'inferno-router'
+import { Link } from 'inferno-router'
 
 import { config } from '../../../../config'
 import { isPeonyError } from '../../../utils/peony'
@@ -14,7 +14,6 @@ export default class Users extends Component {
       usersData: null,
       peonyError: null,
       lastError: null,
-      isNotAuthorized: false, // TODO redirect if not authorized, copy boilerplate from Posts
       // query parameters
       sortBy: 'createdAt',
       sortOrder: 'ascending',
@@ -28,8 +27,8 @@ export default class Users extends Component {
   }
 
   componentDidUpdate () {
-    if (this.state.errorStatus) {
-      // TODO log or display error before redirecting? Pass error to login page?
+    if (this.state.peonyError && this.state.peonyError.code === 401) {
+      this.props.notAuthorized()
     }
   }
 
@@ -77,12 +76,6 @@ export default class Users extends Component {
   }
 
   render () {
-    if (this.state.errorStatus === 401) {
-      return (
-        <Redirect to='/' />
-      )
-    }
-
     if (this.state.usersData && this.state.usersData.length > 0) {
       return (
         <div>

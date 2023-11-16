@@ -38,6 +38,10 @@ export default class Store extends Component {
   }
 
   componentDidUpdate () {
+    if (this.state.peonyError && this.state.peonyError.code === 401) {
+      this.props.notAuthorized()
+    }
+
     if (this.state.hasUpdated === true) {
       this.setState({ hasUpdated: false })
     }
@@ -255,7 +259,7 @@ async function handleUpdate (instance) {
     inviteLinkTemplate,
     defaultStockLocationId,
     defaultSalesChannelId
-  } = instance.state.postData
+  } = instance.state.storeData
 
   const metadataObject = instance.state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
 

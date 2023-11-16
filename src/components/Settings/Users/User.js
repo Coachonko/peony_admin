@@ -1,10 +1,9 @@
 import { Component, linkEvent } from 'inferno'
-import { Redirect } from 'inferno-router'
 
 import { config } from '../../../../config'
 import { isPeonyError } from '../../../utils/peony'
 import { makeCancelable } from '../../../utils/promises'
-import { getToken, appendToken, isTokenAvailabile, unsetToken, setLoginFrom } from '../../../utils/auth'
+import { getToken, appendToken } from '../../../utils/auth'
 import { isValidSlug } from '../../../utils/text'
 
 import { Metadata } from '../../shared/Metadata'
@@ -16,13 +15,20 @@ export default class User extends Component {
     this.state = {
       peonyError: null,
       lastError: null,
-      isNotAuthorized: false,
       sortedMetadata: null,
       userData: null
     }
 
     this.updateLastError = this.updateLastError.bind(this)
     this.updateSortedMetadata = this.updateSortedMetadata.bind(this)
+  }
+
+  updateLastError (newLastError) {
+    this.setState({ lastError: newLastError })
+  }
+
+  updateSortedMetadata (newSortedMetadata) {
+    this.setState({ sortedMetadata: newSortedMetadata })
   }
 
   async componentDidMount () {
@@ -33,10 +39,8 @@ export default class User extends Component {
   }
 
   componentDidUpdate () {
-    const tokenIsAvailabile = isTokenAvailabile()
-    if (this.state.peonyError && this.state.peonyError.code === 401 && tokenIsAvailabile) {
-      unsetToken()
-      this.setState({ isNotAuthorized: true })
+    if (this.state.peonyError && this.state.peonyError.code === 401) {
+      this.props.notAuthorized()
     }
   }
 
@@ -107,22 +111,7 @@ export default class User extends Component {
     }
   }
 
-  updateLastError (newLastError) {
-    this.setState({ lastError: newLastError })
-  }
-
-  updateSortedMetadata (newSortedMetadata) {
-    this.setState({ sortedMetadata: newSortedMetadata })
-  }
-
   render () {
-    if (this.state.isNotAuthorized === true) {
-      setLoginFrom(this.props.location.pathname)
-      return (
-        <Redirect to='/login' />
-      )
-    }
-
     if (this.state.userData && this.state.userData.id) {
       let deleteButton
       if (this.state.userData.deletedAt) {

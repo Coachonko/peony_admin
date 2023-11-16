@@ -2,7 +2,7 @@ import { Component, linkEvent } from 'inferno'
 import { Redirect } from 'inferno-router'
 
 import { config } from '../../../config'
-import { getToken, isTokenAvailabile, unsetToken, appendToken, setLoginFrom } from '../../utils/auth'
+import { getToken, appendToken } from '../../utils/auth'
 import { isPeonyError } from '../../utils/peony'
 import { makeCancelable } from '../../utils/promises'
 
@@ -18,7 +18,6 @@ export default class Post extends Component {
       isSubmitting: false,
       peonyError: null,
       lastError: null,
-      isNotAuthorized: false,
       newPathname: null,
       hasUpdated: false,
       settings: false,
@@ -29,6 +28,14 @@ export default class Post extends Component {
     this.updateLastError = this.updateLastError.bind(this)
     this.updateSortedMetadata = this.updateSortedMetadata.bind(this)
     this.updateContent = this.updateContent.bind(this)
+  }
+
+  updateLastError (newLastError) {
+    this.setState({ lastError: newLastError })
+  }
+
+  updateSortedMetadata (newSortedMetadata) {
+    this.setState({ sortedMetadata: newSortedMetadata })
   }
 
   updateContent (newContent) {
@@ -68,10 +75,8 @@ export default class Post extends Component {
   }
 
   componentDidUpdate () {
-    const tokenIsAvailabile = isTokenAvailabile()
-    if (this.state.peonyError && this.state.peonyError.code === 401 && tokenIsAvailabile) {
-      unsetToken()
-      this.setState({ isNotAuthorized: true })
+    if (this.state.peonyError && this.state.peonyError.code === 401) {
+      this.props.notAuthorized()
     }
 
     if (this.state.newPathname) {
@@ -153,22 +158,7 @@ export default class Post extends Component {
     }
   }
 
-  updateLastError (newLastError) {
-    this.setState({ lastError: newLastError })
-  }
-
-  updateSortedMetadata (newSortedMetadata) {
-    this.setState({ sortedMetadata: newSortedMetadata })
-  }
-
   render () {
-    if (this.state.isNotAuthorized === true) {
-      setLoginFrom(this.props.location.pathname)
-      return (
-        <Redirect to='/login' />
-      )
-    }
-
     if (this.state.newPathname) {
       return <Redirect to={this.state.newPathname} />
     }

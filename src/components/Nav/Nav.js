@@ -48,12 +48,21 @@ class Nav extends Component {
             <li>
               <NavLink to='/'>Dashboard</NavLink>
             </li>
+            {/* TODO separator for CMS */}
             <li>
               <NavLink to='/pages'>Pages</NavLink>
             </li>
             <li>
               <NavLink to='/posts'>Posts</NavLink>
             </li>
+            <li>
+              <NavLink to='/post_tags'>Tags</NavLink>
+            </li>
+            {/* <li>
+              <NavLink to='/customers'>Customers</NavLink>
+            </li> */}
+            {/* TODO separator for commerce */}
+            {/* TODO commerce links: products, discounts, orders, inventory, promotions */}
             <li>
               <NavLink to='/settings'>Settings</NavLink>
             </li>

@@ -1,9 +1,9 @@
 import { Component, linkEvent } from 'inferno'
-import { Redirect, Link } from 'inferno-router'
+import { Link } from 'inferno-router'
 
 import { config } from '../../../config'
 import { isPeonyError } from '../../utils/peony'
-import { isTokenAvailabile, appendToken, getToken, unsetToken, setLoginFrom } from '../../utils/auth'
+import { appendToken, getToken } from '../../utils/auth'
 import { makeCancelable } from '../../utils/promises'
 
 // Posts expects:
@@ -16,7 +16,6 @@ export default class Posts extends Component {
       listData: null,
       peonyError: null,
       lastError: null,
-      isNotAuthorized: false,
       // query parameters
       sortBy: 'created_at',
       sortOrder: 'ascending',
@@ -26,8 +25,6 @@ export default class Posts extends Component {
       filterByAuthor: null,
       filterByTag: null
     }
-
-    this.isNotAuthorized = this.isNotAuthorized.bind(this)
   }
 
   async componentDidMount () {
@@ -45,10 +42,8 @@ export default class Posts extends Component {
       await this.resolveGettingListData()
     }
 
-    const tokenIsAvailabile = isTokenAvailabile()
-    if (this.state.peonyError && this.state.peonyError.code === 401 && tokenIsAvailabile) {
-      unsetToken()
-      this.setState({ isNotAuthorized: true })
+    if (this.state.peonyError && this.state.peonyError.code === 401) {
+      this.props.notAuthorized()
     }
   }
 
@@ -56,10 +51,6 @@ export default class Posts extends Component {
     if (this.gettingListData) {
       this.gettingListData.cancel()
     }
-  }
-
-  isNotAuthorized () {
-    this.setState({ isNotAuthorized: true })
   }
 
   async getListData () {
@@ -106,13 +97,6 @@ export default class Posts extends Component {
   }
 
   render () {
-    if (this.state.isNotAuthorized === true) {
-      setLoginFrom(this.props.location.pathname)
-      return (
-        <Redirect to='/login' />
-      )
-    }
-
     if (this.state.listData && this.state.listData.length >= 0) {
       let title
       if (this.props.match.path === '/pages') {
@@ -207,9 +191,9 @@ function handleSettings (instance, event) {
   instance.setState({ [name]: value })
 }
 
-function List () {
+function List ({ listData }) {
   const listItems = []
-  for (const post of this.props.listData) {
+  for (const post of listData) {
     let linkToPost
     if (post.postType === 'post') {
       linkToPost = `/posts/post/${post.id}`
@@ -218,9 +202,17 @@ function List () {
       linkToPost = `/pages/page/${post.id}`
     }
 
-    let authors // TODO this is unnecessary, post should always have at least one author
-    if (post.authors) {
-      authors = post.authors.join(', ')
+    let primaryAuthor
+    if (post.authors[0].firstName !== '' || post.authors[0].lastName !== '') {
+      primaryAuthor = `${post.authors[0].firstName} ${post.authors[0].lastName}`.trim()
+    } else {
+      primaryAuthor = post.authors[0].handle
+    }
+    primaryAuthor = `by ${primaryAuthor}`
+
+    let primaryTag
+    if (post.tags && post.tags.length > 0) {
+      primaryTag = `in ${post.tags[0].title}`
     }
 
     const createdAt = new Date(post.createdAt)
@@ -260,7 +252,7 @@ function List () {
             {post.subtitle}
           </div>
           <div>
-            {authors}
+            {primaryAuthor} {primaryTag}
           </div>
           <div>
             {post.status}
