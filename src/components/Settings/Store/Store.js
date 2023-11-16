@@ -5,7 +5,7 @@ import { appendToken, getToken } from '../../../utils/auth'
 import { makeCancelable } from '../../../utils/promises'
 import { isPeonyError } from '../../../utils/peony'
 
-import { Metadata } from '../../shared/Metadata'
+import { Metadata } from '../../shared'
 
 export default class Store extends Component {
   constructor (props) {
@@ -17,7 +17,7 @@ export default class Store extends Component {
       isSubmitting: false,
       hasUpdated: null,
       errorStatus: null,
-      errorBody: null
+      errorBody: null // TODO move to peonyError and lastError
     }
 
     this.updateLastError = this.updateLastError.bind(this)

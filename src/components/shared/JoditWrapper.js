@@ -6,7 +6,7 @@ const JoditEditor = (await import('jodit-inferno')).default
 // JoditWrapper expects:
 // `updateValue` function (updates a variable that contains the content of the editor).
 // `value` variable representing the current editor value.
-export class JoditWrapper extends Component {
+export default class JoditWrapper extends Component {
   constructor (props) {
     super(props)
 

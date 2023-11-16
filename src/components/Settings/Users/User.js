@@ -6,7 +6,7 @@ import { makeCancelable } from '../../../utils/promises'
 import { getToken, appendToken } from '../../../utils/auth'
 import { isValidSlug } from '../../../utils/text'
 
-import { Metadata } from '../../shared/Metadata'
+import { Metadata } from '../../shared'
 
 export default class User extends Component {
   constructor (props) {

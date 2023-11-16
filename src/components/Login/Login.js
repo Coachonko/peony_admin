@@ -13,7 +13,7 @@ class Login extends Component {
       password: '',
       isSubmitting: false,
       errorStatus: null,
-      errorBody: null
+      errorBody: null // TODO move to peonyError and lastError
     }
   }
 

@@ -6,8 +6,7 @@ import { getToken, appendToken } from '../../utils/auth'
 import { isPeonyError } from '../../utils/peony'
 import { makeCancelable } from '../../utils/promises'
 
-import { Metadata } from '../shared/Metadata'
-import { JoditWrapper } from './JoditWrapper'
+import { Metadata, JoditWrapper } from '../shared'
 
 export default class Post extends Component {
   constructor (props) {
@@ -48,10 +47,10 @@ export default class Post extends Component {
     })
   }
 
-  componentDidMount () {
+  async componentDidMount () {
     if (this.props.match.params.id) {
       this.gettingPostData = makeCancelable(this.getPostData())
-      this.resolveGettingPostData()
+      await this.resolveGettingPostData()
     } else {
       if (this.props.match.path === '/pages/page') {
         this.setState({
@@ -74,14 +73,14 @@ export default class Post extends Component {
     }
   }
 
-  componentDidUpdate () {
+  async componentDidUpdate () {
     if (this.state.peonyError && this.state.peonyError.code === 401) {
       this.props.notAuthorized()
     }
 
     if (this.state.newPathname) {
       this.gettingPostData = makeCancelable(this.getPostData())
-      this.resolveGettingPostData()
+      await this.resolveGettingPostData()
 
       this.setState({
         newPathname: null,

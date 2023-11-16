@@ -1,6 +1,6 @@
 import { linkEvent } from 'inferno'
 
-export function Metadata ({ lastError, updateLastError, sortedMetadata, updateSortedMetadata }) {
+export default function Metadata ({ lastError, updateLastError, sortedMetadata, updateSortedMetadata }) {
   const metadataGroup = []
   for (let i = 0; i < sortedMetadata.length; i++) {
     const item = sortedMetadata[i]
