@@ -6,7 +6,8 @@ import { getToken, appendToken } from '../../utils/auth'
 import { isPeonyError } from '../../utils/peony'
 import { makeCancelable } from '../../utils/promises'
 
-import { Metadata, JoditWrapper } from '../shared'
+import JoditWrapper from './JoditWrapper'
+import { Metadata } from '../shared'
 
 export default class Post extends Component {
   constructor (props) {
@@ -52,24 +53,28 @@ export default class Post extends Component {
       this.gettingPostData = makeCancelable(this.getPostData())
       await this.resolveGettingPostData()
     } else {
+      // A new post needs a clean start
+      let newPostType
       if (this.props.match.path === '/pages/page') {
-        this.setState({
-          readyForEditing: true,
-          postData: {
-            ...this.state.postData,
-            postType: 'page'
-          }
-        })
+        newPostType = 'page'
       }
       if (this.props.match.path === '/posts/post') {
-        this.setState({
-          readyForEditing: true,
-          postData: {
-            ...this.state.postData,
-            postType: 'post'
-          }
-        })
+        newPostType = 'post'
       }
+      this.setState({
+        readyForEditing: true,
+        postData: {
+          title: '',
+          subtitle: '',
+          excerpt: '',
+          handle: '',
+          featured: false,
+          visibility: 'public',
+          metadata: {},
+          postType: newPostType
+        },
+        sortedMetadata: []
+      })
     }
   }
 
@@ -322,7 +327,7 @@ async function handleSave (instance) {
   instance.setState({ isSubmitting: true }) // TODO lock everything until submit complete
 
   if (!instance.state.postData && !instance.state.postData.title) {
-    const newError = new Error('missing state.title')
+    const newError = new Error('missing state.postData.title')
     console.error(newError)
     instance.setState({
       isSubmitting: false,
