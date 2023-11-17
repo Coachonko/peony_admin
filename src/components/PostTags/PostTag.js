@@ -58,6 +58,8 @@ export default class PostTag extends Component {
   }
 
   async componentDidUpdate () {
+    // TODO update postTagData when saving, updating and deleting.
+    // TODO when postTagData is updated, re-calculate sortedMetadata.
     if (this.state.peonyError && this.state.peonyError.code === 401) {
       this.props.notAuthorized()
     }
@@ -154,6 +156,18 @@ export default class PostTag extends Component {
         saveHandler = handleSave
       }
 
+      let deleteButton
+      if (this.props.match.params.id && this.state.postTagData.deletedAt === '') {
+        deleteButton = (
+          <button
+            type='button'
+            onClick={linkEvent(this, handleDelete)}
+          >
+            Delete
+          </button>
+        )
+      }
+
       return (
         <div>
           <div>
@@ -161,8 +175,9 @@ export default class PostTag extends Component {
               type='button'
               onClick={linkEvent(this, saveHandler)}
             >
-              save
+              Save
             </button>
+            {deleteButton}
           </div>
 
           <form>
@@ -296,7 +311,7 @@ async function handleSave (instance) {
         isSubmitting: false
       })
     } else {
-      const newPathName = `/posts_tags/tag/${data.id}`
+      const newPathName = `/post_tags/tag/${data.id}`
       instance.setState({
         postTagData: {
           ...instance.state.postTagData,
@@ -401,6 +416,49 @@ async function updatePostTagData (postTagWriteable, id) {
       method: 'POST',
       headers: requestHeaders,
       body: JSON.stringify(postTagWriteable)
+    })
+    const data = await response.json()
+    return data
+  } catch (error) {
+    return error
+  }
+}
+
+async function handleDelete (instance) {
+  instance.setState({ isSubmitting: true })
+  const data = await deletePostTag(instance.state.postTagData.id)
+
+  if (data instanceof Error) {
+    console.error(data)
+    instance.setState({
+      lastError: data,
+      isSubmitting: false
+    })
+  } else {
+    if (isPeonyError(data)) {
+      instance.setState({
+        peonyError: data,
+        isSubmitting: false
+      })
+    } else {
+      instance.setState({
+        hasUpdated: true, // TODO use this to show user that update was successful
+        isSubmitting: false
+      })
+    }
+  }
+}
+
+async function deletePostTag (id) {
+  const token = getToken()
+  const requestHeaders = new Headers()
+  requestHeaders.append('Content-Type', 'application/json')
+  appendToken(token, requestHeaders)
+
+  try {
+    const response = await fetch(`${config.PEONY_ADMIN_API}/post_tags/${id}`, {
+      method: 'DELETE',
+      headers: requestHeaders
     })
     const data = await response.json()
     return data
