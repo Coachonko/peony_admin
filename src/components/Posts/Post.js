@@ -174,7 +174,7 @@ export default class Post extends Component {
       /* TODO update menu: radio button published or unpublished, confirm and cancel buttons */
       } else {
         statusButton = <button type='button'>Publish</button>
-      /* TODO publish menu: radio buttons publish now or schedule, confirm and delete buttons */
+        /* TODO publish menu: radio buttons publish now or schedule, confirm and delete buttons */
       }
 
       let settingsMenu
@@ -344,32 +344,7 @@ async function handleSave (instance) {
     return
   }
 
-  // TODO add author_id(s)
-  // TODO add tag_id(s)
-  const {
-    status,
-    featured,
-    visibility,
-    title,
-    subtitle,
-    content,
-    handle,
-    excerpt
-  } = instance.state.postData
-
-  const metadataObject = instance.state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
-
-  const postDataToSend = {
-    status,
-    featured,
-    visibility,
-    title,
-    subtitle,
-    content,
-    handle,
-    excerpt,
-    metadata: metadataObject
-  }
+  const postDataToSend = preparePostWriteable(instance.state)
 
   const data = await submitPostData(postDataToSend, instance.state.postData.postType)
 
@@ -400,6 +375,35 @@ async function handleSave (instance) {
         newPathname: newPathName
       })
     }
+  }
+}
+
+function preparePostWriteable (state) {
+  // TODO add author_id(s)
+  // TODO add tag_id(s)
+  const {
+    status,
+    featured,
+    visibility,
+    title,
+    subtitle,
+    content,
+    handle,
+    excerpt
+  } = state.postData
+
+  const metadataObject = state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
+
+  return {
+    status,
+    featured,
+    visibility,
+    title,
+    subtitle,
+    content,
+    handle,
+    excerpt,
+    metadata: metadataObject
   }
 }
 
@@ -439,30 +443,7 @@ async function handleUpdate (instance) {
     return
   }
 
-  const {
-    status,
-    featured,
-    visibility,
-    title,
-    subtitle,
-    content,
-    handle,
-    excerpt
-  } = instance.state.postData
-
-  const metadataObject = instance.state.sortedMetadata.reduce((acc, curr) => ({ ...acc, ...curr }), {})
-
-  const postDataToSend = {
-    status,
-    featured,
-    visibility,
-    title,
-    subtitle,
-    content,
-    handle,
-    excerpt,
-    metadata: metadataObject
-  }
+  const postDataToSend = preparePostWriteable(instance.state)
 
   const data = await updatePostData(postDataToSend, instance.state.postData.id)
 
@@ -527,5 +508,48 @@ function handleSettings (instance, event) {
         [name]: value
       }
     })
+  }
+}
+
+async function handleDelete (instance) {
+  instance.setState({ isSubmitting: true })
+  const data = await deletePost(instance.state.postData.id)
+
+  if (data instanceof Error) {
+    console.error(data)
+    instance.setState({
+      lastError: data,
+      isSubmitting: false
+    })
+  } else {
+    if (isPeonyError(data)) {
+      instance.setState({
+        peonyError: data,
+        isSubmitting: false
+      })
+    } else {
+      instance.setState({
+        hasUpdated: true, // TODO use this to show user that update was successful
+        isSubmitting: false
+      })
+    }
+  }
+}
+
+async function deletePost (id) {
+  const token = getToken()
+  const requestHeaders = new Headers()
+  requestHeaders.append('Content-Type', 'application/json')
+  appendToken(token, requestHeaders)
+
+  try {
+    const response = await fetch(`${config.PEONY_ADMIN_API}/posts/${id}`, {
+      method: 'DELETE',
+      headers: requestHeaders
+    })
+    const data = await response.json()
+    return data
+  } catch (error) {
+    return error
   }
 }
