@@ -228,10 +228,13 @@ class ProtectedRoute extends Component {
 
     return (
       <Route
-        render={this.props.renderComponent}
-        currentUserData={this.state.currentUserData}
-        notAuthorized={this.notAuthorized}
         {...this.props}
+        render={(props) =>
+          this.props.renderComponent({
+            ...props,
+            currentUserData: this.state.currentUserData,
+            notAuthorized: this.notAuthorized
+          })}
       />
     )
   }
