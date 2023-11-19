@@ -21,6 +21,7 @@ export default class JoditWrapper extends Component {
   render () {
     return (
       <JoditEditor
+        className='jodit-editor'
         config={joditConfig}
         ref={this.editor}
         value={this.props.value}
@@ -54,5 +55,6 @@ const joditConfig = {
   showXPathInStatusbar: false,
   showCharsCounter: true,
   showWordsCounter: true,
-  addNewLine: false
+  addNewLine: false,
+  theme: 'dark' // TODO customize https://xdsoft.net/jodit/examples/theme/dark.html
 }

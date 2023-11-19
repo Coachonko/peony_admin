@@ -117,7 +117,7 @@ export default class Posts extends Component {
       let settings = null
       if (this.state.listData.length > 0) {
         settings = (
-          <>
+          <div className='posts-settings'>
             <div>
               <label for='sort-order'>sort order</label>
               <select
@@ -158,13 +158,13 @@ export default class Posts extends Component {
               {/* TODO filterByAuthor */}
               {/* TODO filterByTag */}
             </div>
-          </>
+          </div>
         )
       }
 
       return (
-        <div>
-          <div>
+        <>
+          <div class='header'>
             <div>
               <h1>{title}</h1>
             </div>
@@ -175,7 +175,7 @@ export default class Posts extends Component {
           </div>
 
           <List listData={this.state.listData} />
-        </div>
+        </>
       )
     }
   }

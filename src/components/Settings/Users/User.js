@@ -142,7 +142,6 @@ export default class User extends Component {
             <button
               type='button'
               onClick={linkEvent(this, handleUpdate)}
-              // TODO disable when submitting
             >
               Save
             </button>

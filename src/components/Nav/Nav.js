@@ -43,41 +43,48 @@ class Nav extends Component {
     const tokenIsAvailabile = isTokenAvailabile()
     if (tokenIsAvailabile === true) {
       return (
-        <nav>
-          <ul>
-            <li>
-              <NavLink to='/'>Dashboard</NavLink>
-            </li>
-            {/* TODO separator for CMS */}
-            <li>
-              <NavLink to='/pages'>Pages</NavLink>
-            </li>
-            <li>
-              <NavLink to='/posts'>Posts</NavLink>
-            </li>
-            <li>
-              <NavLink to='/post_tags'>Tags</NavLink>
-            </li>
-            {/* <li>
-              <NavLink to='/customers'>Customers</NavLink>
-            </li> */}
-            {/* TODO separator for commerce */}
-            {/* TODO commerce links: products, discounts, orders, inventory, promotions */}
-            <li>
-              <NavLink to='/settings'>Settings</NavLink>
-            </li>
-          </ul>
+        <nav className='main-nav'>
+          <div className='header'>
+            peony
+          </div>
 
-          <ul>
-            <li>
-              <button
-                type='button'
-                onClick={linkEvent(this, handleLogout)}
-                disabled={this.state.isLoggingOut}
-              >Log out
-              </button>
-            </li>
-          </ul>
+          <div className='body'>
+            <ul>
+              <li>
+                <NavLink exact to='/'>Dashboard</NavLink>
+              </li>
+            </ul>
+
+            <ul>
+              <li>
+                <NavLink to='/pages'>Pages</NavLink>
+              </li>
+              <li>
+                <NavLink to='/posts'>Posts</NavLink>
+              </li>
+              <li>
+                <NavLink to='/post_tags'>Tags</NavLink>
+              </li>
+
+            </ul>
+
+            {/* <ul>
+              TODO members
+
+              TODO commerce links: products, discounts, orders, inventory, promotions
+            </ul> */}
+          </div>
+
+          <div className='footer'>
+            {/* TODO user info */}
+            <button
+              type='button'
+              onClick={linkEvent(this, handleLogout)}
+              disabled={this.state.isLoggingOut}
+            >Log out
+            </button>
+            <NavLink exact to='/settings'>Settings</NavLink> {/* TODO move to footer */}
+          </div>
         </nav>
       )
     }

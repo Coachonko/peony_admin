@@ -113,7 +113,7 @@ export default class Store extends Component {
       const storeData = this.state.storeData
 
       return (
-        <div>
+        <div className='route-container'>
           <h2>Store</h2>
           <div>
             <button

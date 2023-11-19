@@ -10,3 +10,5 @@
   server are `/login` and NoMatch.
   Solution: API route with tinyhttp, put jwt into cookie and give to client.
 - Editor should upload images to Garage, needs a gallery extension for showcases of many pictures.
+- Responsiveness
+- Accessibility

@@ -1,0 +1,27 @@
+#root {
+  display: flex;
+  height: 100%;
+
+  // components
+  @import 'Alerts.less';
+  @import 'Nav.less';
+  @import 'Routes.less';
+  @import 'Posts.less';
+
+  a {
+
+    &:link,
+    &:hover {
+      color: @magenta
+    }
+
+    &:visited {
+      color: #928374;
+
+      &:hover {
+        color: @magenta
+      }
+    }
+  }
+
+}
