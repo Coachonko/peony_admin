@@ -12,30 +12,7 @@
 @screen-xl: ~"(min-width: @{bp-xl})";
 @screen-hr: ~"(min-width: @{bp-hr})";
 
-/*
- * Fluid font scaling from bp-sm to bp-xl
- * same size from bp-xl to bp-hr then fluid again from bp-hr
- */
-.fluid-font (@min-size, @max-size) {
-  @screen-sm-pxless: unit(@bp-sm);
-  @screen-xl-pxless: unit(@bp-xl);
-  @screen-hr-pxless: unit(@bp-hr);
-  @hr-size: (@max-size / (@screen-hr-pxless/100));
-  @hr-size-vw: unit(@hr-size, vw);
-  @min-size-px: unit(@min-size, px);
-  @max-size-px: unit(@max-size, px);
-
-  font-size: @min-size-px;
-
-  @media @screen-sm {
-    font-size: calc(@min-size-px + (((100vw - @bp-sm) / (@screen-xl-pxless - @screen-sm-pxless)) * (@max-size - @min-size)));
-  }
-
-  @media @screen-xl {
-    font-size: @max-size-px;
-  }
-
-  @media @screen-hr {
-    font-size: @hr-size-vw;
-  }
+html,
+body {
+  height: 100%;
 }

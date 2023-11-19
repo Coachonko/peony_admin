@@ -1,0 +1,66 @@
+/*
+ * Fluid font scaling from bp-sm to bp-xl
+ * same size from bp-xl to bp-hr then fluid again from bp-hr
+ */
+.fluid-font (@min-size, @max-size) {
+  @screen-sm-pxless: unit(@bp-sm);
+  @screen-xl-pxless: unit(@bp-xl);
+  @screen-hr-pxless: unit(@bp-hr);
+  @hr-size: (@max-size / (@screen-hr-pxless/100));
+  @hr-size-vw: unit(@hr-size, vw);
+  @min-size-px: unit(@min-size, px);
+  @max-size-px: unit(@max-size, px);
+
+  font-size: @min-size-px;
+
+  @media @screen-sm {
+    font-size: calc(@min-size-px + (((100vw - @bp-sm) / (@screen-xl-pxless - @screen-sm-pxless)) * (@max-size - @min-size)));
+  }
+
+  @media @screen-xl {
+    font-size: @max-size-px;
+  }
+
+  @media @screen-hr {
+    font-size: @hr-size-vw;
+  }
+}
+
+html,
+body {
+  .fluid-font(14, 22);
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin-bottom: 30px;
+}
+
+h1 {
+  .fluid-font(40, 54);
+}
+
+h2 {
+  .fluid-font(28, 46);
+}
+
+h3 {
+  .fluid-font(22, 42);
+}
+
+h4 {
+  .fluid-font(18, 38);
+}
+
+h5 {
+  .fluid-font(16, 32);
+}
+
+p {
+  .fluid-font(14, 22);
+}

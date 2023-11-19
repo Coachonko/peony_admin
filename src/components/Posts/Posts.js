@@ -100,10 +100,10 @@ export default class Posts extends Component {
     if (this.state.listData && this.state.listData.length >= 0) {
       let title
       if (this.props.match.path === '/pages') {
-        title = 'pages'
+        title = 'Pages'
       }
       if (this.props.match.path === '/posts') {
-        title = 'posts'
+        title = 'Posts'
       }
 
       let linkToNew
@@ -269,7 +269,7 @@ function List ({ listData }) {
   }
 
   return (
-    <div>
+    <div className='posts-list'>
       <ol>
         {listItems}
       </ol>
