@@ -44,5 +44,57 @@ nav.main-nav {
   & .footer {
     display: flex;
     justify-content: space-between;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-bottom: 5%;
+
+    & .user-menu {
+
+      & .toggle {
+        border: none;
+
+        &:hover {
+          color: @magenta;
+        }
+      }
+
+      & ul {
+        position: absolute;
+        bottom: 10%;
+        box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+        border-radius: 10px;
+
+        & li {
+          padding-left: 20px;
+          padding-right: 20px;
+          padding-bottom: 10px;
+          padding-top: 10px;
+
+          &:hover {
+            background-color: @bright-black;
+          }
+
+          & a:visited {
+            color: @white;
+          }
+
+          & button {
+            border: none;
+          }
+        }
+
+        & hr {
+          border-color: @white;
+        }
+      }
+
+      & .settings a:visited {
+        color: inherit;
+
+        &:hover {
+          color: @magenta
+        }
+      }
+    }
   }
 }

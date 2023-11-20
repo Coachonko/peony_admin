@@ -13,6 +13,7 @@
   "repository": "https://github.com/Coachonko/peony_admin",
   "license": "NCSA",
   "dependencies": {
+    "circum-icons-inferno": "^3.0.0",
     "inferno": "^8.2.2",
     "inferno-router": "^8.2.2",
     "jodit-inferno": "^1.2.0"

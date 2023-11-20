@@ -12,6 +12,7 @@ import { PostTags, PostTag } from './PostTags'
 import { Settings, Store, Users, User } from './Settings'
 import { Login } from './Login'
 import { NoMatch } from './NoMatch'
+import { Nav } from './shared'
 
 export default function Routes (props) {
   return (
@@ -227,17 +228,23 @@ class ProtectedRoute extends Component {
     }
 
     return (
-      <div className='route-container'>
-        <Route
-          {...this.props}
-          render={(props) =>
-            this.props.renderComponent({
-              ...props,
-              currentUserData: this.state.currentUserData,
-              notAuthorized: this.notAuthorized
-            })}
+      <>
+        <Nav
+          currentUserData={this.state.currentUserData}
+          notAuthorized={this.notAuthorized}
         />
-      </div>
+        <div className='route-container'>
+          <Route
+            {...this.props}
+            render={(props) =>
+              this.props.renderComponent({
+                ...props,
+                currentUserData: this.state.currentUserData,
+                notAuthorized: this.notAuthorized
+              })}
+          />
+        </div>
+      </>
     )
   }
 }

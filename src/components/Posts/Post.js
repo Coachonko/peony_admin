@@ -293,31 +293,31 @@ export default class Post extends Component {
 
       return (
         <div className='editor'>
-          <div className='editor-header'>
-            <button
-              type='button'
-              onClick={linkEvent(this, saveHandler)}
-            >
-              save
-            </button>
-            {statusButton}
-            <button
-              className='settings-toggle'
-              title='Settings'
-              type='button'
-              onClick={linkEvent(this, toggleSettings)}
-            >
-              settings
-            </button>
+            <div className='editor-header'>
+              <button
+                type='button'
+                onClick={linkEvent(this, saveHandler)}
+              >
+                save
+              </button>
+              {statusButton}
+              <button
+                className='settings-toggle'
+                title='Settings'
+                type='button'
+                onClick={linkEvent(this, toggleSettings)}
+              >
+                settings
+              </button>
+            </div>
+
+            <JoditWrapper
+              value={this.state.postData.content}
+              updateValue={this.updateContent}
+            />
+
+            {settingsMenu}
           </div>
-
-          <JoditWrapper
-            value={this.state.postData.content}
-            updateValue={this.updateContent}
-          />
-
-          {settingsMenu}
-        </div>
       )
     }
   }
