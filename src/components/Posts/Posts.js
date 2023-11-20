@@ -164,15 +164,14 @@ export default class Posts extends Component {
 
       return (
         <>
-          <div class='header'>
-            <div>
-              <h1>{title}</h1>
-            </div>
-            {settings}
-            <div>
+          <div className='posts-header'>
+            <h1>{title}</h1>
+            <div className='posts-new-link'>
               <Link to={linkToNew}>New</Link>
             </div>
           </div>
+
+          {settings}
 
           <List listData={this.state.listData} />
         </>

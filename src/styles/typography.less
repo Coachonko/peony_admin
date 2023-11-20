@@ -1,8 +1,23 @@
 /*
- * Fluid font scaling from bp-sm to bp-xl
- * same size from bp-xl to bp-hr then fluid again from bp-hr
+ * Native fonts
+ * https://www.smashingmagazine.com/2015/11/using-system-ui-fonts-practical-guide/
  */
-.fluid-font (@min-size, @max-size) {
+@font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+@font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+/*
+ * Fluid font scaling mixin
+ *
+ * font-size:
+ * is set to min-size below bp-sm.
+ * scales fluidly up to min-size * 1.125 between bp-sm and bp-xl.
+ * is set to min-size * 1.125 between bp-xl and bp-hr
+ * scales fluidly from bp-hr
+ */
+@min-size: 16;
+
+.fluid-font (@min-size) {
+  @max-size: @min-size * 1.125;
   @screen-sm-pxless: unit(@bp-sm);
   @screen-xl-pxless: unit(@bp-xl);
   @screen-hr-pxless: unit(@bp-hr);
@@ -28,7 +43,8 @@
 
 html,
 body {
-  .fluid-font(14, 22);
+  font-family: @font-sans;
+  .fluid-font(16);
 }
 
 p,
@@ -41,26 +57,56 @@ h6 {
   margin-bottom: 30px;
 }
 
-h1 {
-  .fluid-font(40, 54);
+h1,
+.h1 {
+  .fluid-font(@min-size * 2.5);
 }
 
-h2 {
-  .fluid-font(28, 46);
+h2,
+.h2 {
+  .fluid-font(@min-size * 2);
 }
 
-h3 {
-  .fluid-font(22, 42);
+h3,
+.h3 {
+  .fluid-font(@min-size * 1.75);
 }
 
-h4 {
-  .fluid-font(18, 38);
+h4,
+.h4 {
+  .fluid-font(@min-size * 1.5);
 }
 
-h5 {
-  .fluid-font(16, 32);
+h5,
+.h5 {
+  .fluid-font(@min-size * 1.25);
+}
+
+h6,
+.h6 {
+  .fluid-font(@min-size);
 }
 
 p {
-  .fluid-font(14, 22);
+  .fluid-font(@min-size);
+}
+
+.display-1 {
+  .fluid-font(@min-size * 5);
+}
+
+.display-2 {
+  .fluid-font(@min-size * 4.5);
+}
+
+.display-3 {
+  .fluid-font(@min-size * 4);
+}
+
+.display-4 {
+  .fluid-font(@min-size * 3.5);
+}
+
+.display-5 {
+  .fluid-font(@min-size * 3);
 }

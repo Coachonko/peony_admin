@@ -25,4 +25,31 @@ body {
 
 select {
   background-color: @black;
+  border: 1px solid @white;
+}
+
+input {
+  background-color: @black;
+  color: @white;
+  border: 1px solid @white;
+}
+
+button {
+  border: 1px solid @white;
+}
+
+a {
+
+  &:link,
+  &:hover {
+    color: @blue
+  }
+
+  &:visited {
+    color: #928374;
+
+    &:hover {
+      color: @blue
+    }
+  }
 }

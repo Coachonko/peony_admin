@@ -41,32 +41,34 @@ nav.main-nav {
 
   }
 
-  & .footer {
+  .footer {
     display: flex;
     justify-content: space-between;
     padding-left: 10%;
     padding-right: 10%;
     padding-bottom: 5%;
 
-    & .user-menu {
+    .user-menu {
 
-      & .toggle {
+      .toggle {
         border: none;
 
         &:hover {
-          color: @magenta;
+          color: @blue;
         }
       }
 
-      & ul {
+      ul {
         position: absolute;
         bottom: 10%;
-        box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         border-radius: 10px;
+        padding-top: 15px;
+        padding-bottom: 15px;
 
-        & li {
-          padding-left: 20px;
-          padding-right: 20px;
+        li {
+          padding-left: 30px;
+          padding-right: 30px;
           padding-bottom: 10px;
           padding-top: 10px;
 
@@ -74,26 +76,31 @@ nav.main-nav {
             background-color: @bright-black;
           }
 
-          & a:visited {
+          a:visited {
             color: @white;
           }
 
-          & button {
+          button {
             border: none;
           }
         }
 
-        & hr {
-          border-color: @white;
+        hr {
+          border: none;
+          height: 1px;
+          background-color: @white;
+          margin-top: 10px;
+          margin-bottom: 10px;
         }
       }
 
-      & .settings a:visited {
-        color: inherit;
+    }
 
-        &:hover {
-          color: @magenta
-        }
+    .settings a:visited {
+      color: @white;
+
+      &:hover {
+        color: @blue
       }
     }
   }
