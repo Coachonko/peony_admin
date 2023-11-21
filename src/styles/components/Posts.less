@@ -1,28 +1,80 @@
-.posts-header {
+.posts-settings {
   display: flex;
-  justify-content: space-between;
+  justify-content: right;
+
+  label {
+    padding-right: 5px;
+    padding-left: 25px;
+  }
 }
 
-.posts-new-link {
-  border: 1px solid @white;
-  border-radius: 15px;
-  height: min-content;
+.posts-list {
+  ol {
+    margin-top: 50px;
 
-  &:hover {
-    background-color: @bright-black;
-  }
+    li {
+      padding-top: 30px;
+      padding-bottom: 20px;
+      padding-right: 20px;
+      margin-bottom: 20px;
+      border-right: 1px solid @blue;
 
-  a {
-    display: block;
-    padding-top: 20px;
-    padding-bottom: 20px;
-    padding-left: 30px;
-    padding-right: 30px;
+      &:hover {
+        background-color: #ffffff10;
+      }
 
-    &:visited {
-      color: @white
+      a {
+        display: flex;
+        justify-content: space-between;
+
+        &:visited {
+          color: @white;
+        }
+
+        h3,
+        p {
+          margin-bottom: 0;
+        }
+
+        .post-info {
+          display: flex;
+          flex-direction: column;
+
+          span {
+            padding-right: 10px;
+          }
+
+          .title {
+            color: @bright-blue;
+          }
+
+          .primary-author {
+            color: @yellow;
+          }
+
+          .primary-tag {}
+
+          .visibility {}
+
+          .time-ago {}
+        }
+
+        .status {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+
+          &.draft {
+            color: @red;
+          }
+
+          &.published {
+            color: @green;
+          }
+
+        }
+
+      }
     }
   }
 }
-
-.posts-settings {}

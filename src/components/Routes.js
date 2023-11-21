@@ -227,6 +227,8 @@ class ProtectedRoute extends Component {
       return <Redirect to='/login' />
     }
 
+    // TODO when error fetching, because server offline, show an error and something
+
     return (
       <>
         <Nav

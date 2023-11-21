@@ -164,9 +164,9 @@ export default class Posts extends Component {
 
       return (
         <>
-          <div className='posts-header'>
+          <div className='route-header'>
             <h1>{title}</h1>
-            <div className='posts-new-link'>
+            <div className='new-link'>
               <Link to={linkToNew}>New</Link>
             </div>
           </div>
@@ -207,11 +207,11 @@ function List ({ listData }) {
     } else {
       primaryAuthor = post.authors[0].handle
     }
-    primaryAuthor = `by ${primaryAuthor}`
+    primaryAuthor = `${primaryAuthor}`
 
     let primaryTag
     if (post.tags && post.tags.length > 0) {
-      primaryTag = `in ${post.tags[0].title}`
+      primaryTag = `${post.tags[0].title}`
     }
 
     const createdAt = new Date(post.createdAt)
@@ -240,27 +240,24 @@ function List ({ listData }) {
       timeUnit += 's'
     }
 
+    let primaryTagElement
+    if (primaryTag) {
+      primaryTagElement = <>in <span className='primary-tag'>{primaryTag}</span></>
+    }
+
     listItems.push(
-      // title author status created_at tag
       <li key={post.id}>
         <Link to={linkToPost}>
-          <div>
-            {post.title}
+          <div className='post-info'>
+            <h3 className='title'>{post.title}</h3>
+            <p>
+              by <span className='primary-author'>{primaryAuthor}</span>
+              {primaryTagElement}
+              <span className='time-ago'>{timeValue} {timeUnit} ago</span>
+            </p>
           </div>
-          <div>
-            {post.subtitle}
-          </div>
-          <div>
-            {primaryAuthor} {primaryTag}
-          </div>
-          <div>
+          <div className={`status ${post.status}`}>
             {post.status}
-          </div>
-          <div>
-            {post.visibility}
-          </div>
-          <div>
-            {timeValue} {timeUnit} ago
           </div>
         </Link>
       </li>

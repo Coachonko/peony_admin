@@ -4,8 +4,14 @@ nav.main-nav {
   flex-direction: column;
   flex-shrink: 0;
   width: 320px;
+  border-right: 1px solid @white;
 
-  & .header {}
+  & .header {
+    display: flex;
+    justify-content: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
 
   & .body {
     display: flex;
@@ -15,7 +21,7 @@ nav.main-nav {
     ul {
       display: flex;
       flex-direction: column;
-      margin-top: 40px;
+      margin-bottom: 30px;
 
       li {
 
@@ -26,7 +32,9 @@ nav.main-nav {
 
       a {
         display: flex;
-        padding: 10px 40px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 40px;
 
         &:visited,
         &:hover {

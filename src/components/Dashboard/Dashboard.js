@@ -3,7 +3,10 @@ import { Component } from 'inferno'
 export default class Dashboard extends Component {
   render () {
     return (
-      <h1>Dashboard</h1>
+      <div className='route-header'>
+        <h1>Dashboard</h1>
+
+      </div>
     )
   }
 }

@@ -114,17 +114,16 @@ export default class PostTags extends Component {
       }
 
       return (
-        <div>
-          <div>
-            <div>
-              <h1>Tags</h1>
-            </div>
-            <div>
+        <>
+          <div className='route-header'>
+            <h1>Tags</h1>
+            <div className='new-link'>
               <Link to='/post_tags/tag'>New</Link>
             </div>
           </div>
+          <div />
           {tags}
-        </div>
+        </>
       )
     }
   }
