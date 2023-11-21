@@ -256,9 +256,9 @@ function List ({ listData }) {
               <span className='time-ago'>{timeValue} {timeUnit} ago</span>
             </p>
           </div>
-          <div className={`status ${post.status}`}>
+          <span className={`status ${post.status}`}>
             {post.status}
-          </div>
+          </span>
         </Link>
       </li>
     )

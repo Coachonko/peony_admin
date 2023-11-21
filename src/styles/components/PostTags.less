@@ -1,0 +1,38 @@
+.post-tags-list {
+  ol {
+    margin-top: 50px;
+
+    li {
+      .post-list-item;
+
+      a {
+        .post-tag-info {
+
+          h3,
+          p {
+            margin-bottom: 0;
+          }
+
+          .title {
+            color: @bright-blue;
+          }
+
+        }
+
+        .visibility {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+
+          &.public {
+            color: @green
+          }
+
+          &.paid {
+            color: @yellow
+          }
+        }
+      }
+    }
+  }
+}

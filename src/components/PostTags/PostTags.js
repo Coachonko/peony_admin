@@ -89,27 +89,26 @@ export default class PostTags extends Component {
           listItems.push(
             <li key={tag.id}>
               <Link to={linkToPostTag}>
-                <div>
-                  {tag.title}
+                <div className='post-tag-info'>
+                  <h3 className='title'>{tag.title}</h3>
+                  <p>
+                    <span className='post-amount'>
+                      {tag.posts.length} posts
+                    </span>
+                  </p>
                 </div>
-                <div>
-                  {tag.subtitle}
-                </div>
-                <div>
-                  {tag.visibility}
-                </div>
-                <div>
-                  {tag.posts.length} posts
-                </div>
+                <span className={`visibility ${tag.visibility}`}>{tag.visibility}</span>
               </Link>
             </li>
           )
         }
 
         tags = (
-          <ol>
-            {listItems}
-          </ol>
+          <div className='post-tags-list'>
+            <ol>
+              {listItems}
+            </ol>
+          </div>
         )
       }
 

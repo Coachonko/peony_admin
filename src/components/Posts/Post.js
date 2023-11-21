@@ -9,6 +9,8 @@ import { makeCancelable } from '../../utils/promises'
 import JoditWrapper from './JoditWrapper'
 import { Metadata } from '../shared'
 
+import { CircumIcon } from 'circum-icons-inferno'
+
 export default class Post extends Component {
   constructor (props) {
     super(props)
@@ -293,13 +295,15 @@ export default class Post extends Component {
 
       return (
         <div className='editor'>
-            <div className='editor-header'>
-              <button
-                type='button'
-                onClick={linkEvent(this, saveHandler)}
-              >
-                save
-              </button>
+          <div className='editor-header'>
+            <button
+              className='save-button'
+              type='button'
+              onClick={linkEvent(this, saveHandler)}
+            >
+              <CircumIcon name='floppy_disk' />
+            </button>
+            <div className='settings-right'>
               {statusButton}
               <button
                 className='settings-toggle'
@@ -307,17 +311,18 @@ export default class Post extends Component {
                 type='button'
                 onClick={linkEvent(this, toggleSettings)}
               >
-                settings
+                <CircumIcon name='square_more' />
               </button>
             </div>
-
-            <JoditWrapper
-              value={this.state.postData.content}
-              updateValue={this.updateContent}
-            />
-
-            {settingsMenu}
           </div>
+
+          <JoditWrapper
+            value={this.state.postData.content}
+            updateValue={this.updateContent}
+          />
+
+          {settingsMenu}
+        </div>
       )
     }
   }
