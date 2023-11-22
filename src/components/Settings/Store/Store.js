@@ -114,18 +114,21 @@ export default class Store extends Component {
 
       return (
         <div className='route-container'>
-          <h2>Store</h2>
-          <div>
-            <button
-              type='button'
-              onClick={linkEvent(this, handleUpdate)}
-            >
-              save
-            </button>
+          <div className='route-header'>
+            <h2>Store</h2>
+            <div>
+              <button
+                type='button'
+                onClick={linkEvent(this, handleUpdate)}
+              >
+                save
+              </button>
+            </div>
           </div>
-          <table>
+
+          <table className='store-table'>
             <caption>
-              Store settings
+              <span className='h4'>Store settings</span>
             </caption>
 
             <tbody>
@@ -134,11 +137,11 @@ export default class Store extends Component {
                 <td data-cell='id'>{storeData.id}</td>
               </tr>
               <tr>
-                <th scope='row'>Creation date</th>
+                <th scope='row'>Created</th>
                 <td data-cell='createdAt'>{storeData.createdAt}</td>
               </tr>
               <tr>
-                <th scope='row'>Last updated</th>
+                <th scope='row'>Updated</th>
                 <td data-cell='updatedAt'>{storeData.updatedAt}</td>
               </tr>
               <tr>

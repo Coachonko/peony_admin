@@ -4,7 +4,12 @@
   @import 'Posts.less';
   @import 'Post.less';
   @import 'PostTags.less';
+  @import 'PostTag.less';
   @import 'Settings.less';
+  @import 'Users.less';
+  @import 'User.less';
+  @import 'Store.less';
+
   // shared
   @import 'mixins.less';
   @import 'Alerts.less';
@@ -21,5 +26,34 @@
     padding-bottom: 5px;
     padding-right: 10px;
     padding-left: 10px;
+  }
+
+  table {
+
+    caption {
+      text-align: left;
+      padding-top: 40px;
+      padding-bottom: 40px;
+    }
+
+    th {
+      text-align: left;
+      vertical-align: top;
+      font-weight: normal;
+      padding-top: 0;
+      padding-bottom: 0px;
+      padding-right: 40px;
+      padding-left: 0;
+    }
+
+    td {
+      padding-bottom: 20px;
+    }
+
+    th span,
+    td span {
+      display: block;
+      padding-top: 10px;
+    }
   }
 }

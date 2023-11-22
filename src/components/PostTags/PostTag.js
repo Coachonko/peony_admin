@@ -170,7 +170,7 @@ export default class PostTag extends Component {
 
       return (
         <div>
-          <div>
+          <div className='route-header'>
             <button
               type='button'
               onClick={linkEvent(this, saveHandler)}
@@ -180,7 +180,7 @@ export default class PostTag extends Component {
             {deleteButton}
           </div>
 
-          <form>
+          <form className='post-tag-form'>
             <div className='form-group'>
               <label for='title'>Title</label>
               <input
@@ -207,7 +207,7 @@ export default class PostTag extends Component {
             </div>
             <div className='form-group'>
               <label for='excerpt'>Excerpt</label>
-              <input
+              <textarea
                 name='excerpt'
                 id='excerpt'
                 type='text'

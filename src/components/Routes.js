@@ -100,13 +100,13 @@ export default function Routes (props) {
       />
       <ProtectedRoute
         exact
-        path='/settings/user'
+        path='/settings/users/user'
         renderComponent={(props) =>
           <User {...props} {...this.props} />}
       />
       <ProtectedRoute
         exact
-        path='/settings/user/:id'
+        path='/settings/users/user/:id'
         renderComponent={(props) =>
           <User {...props} {...this.props} />}
       />

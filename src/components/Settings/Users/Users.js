@@ -78,12 +78,19 @@ export default class Users extends Component {
   render () {
     if (this.state.usersData && this.state.usersData.length > 0) {
       return (
-        <div>
-          <div>
+        <>
+          <div className='route-header'>
             <div>
               <h1>Users</h1>
             </div>
 
+            <div className='new-link'>
+              {/* // TODO header with invite button (don't create new users manually) */}
+              <Link to='/settings/user'>New</Link>
+            </div>
+          </div>
+
+          <div className='route-settings'>
             <div>
               <label for='sort-by'>sort by</label>
               <select
@@ -123,15 +130,10 @@ export default class Users extends Component {
                 <option value='contributor'>contributor</option>
               </select>
             </div>
-
-            <div>
-              {/* // TODO header with invite button (don't create new users manually) */}
-              <Link to='/settings/user'>New</Link>
-            </div>
           </div>
 
-          <List data={this.state.usersData} />
-        </div>
+          <List listData={this.state.usersData} />
+        </>
       )
     }
   }
@@ -147,47 +149,33 @@ function handleSettings (instance, event) {
   instance.setState({ [name]: value })
 }
 
-function List ({ data }) {
-  return (
-    // TODO use ol like posts
-    <table>
-      <caption>
-        List of all users
-      </caption>
+function List ({ listData }) {
+  if (listData) {
+    const listItems = []
+    for (const user of listData) {
+      const linkToUser = `users/user/${user.id}`
+      listItems.push(
+        <li key={user.id}>
+          <Link to={linkToUser}>
+            <div className='user-info'>
+              <span className='h4 email'>{user.email}</span>
+              <p>
+                Since <span className='since'>{user.createdAt}</span>
+              </p>
+            </div>
 
-      <thead>
-        <tr>
-          <th key='first-name'>First name</th>
-          <th key='last-name'>Last name</th>
-          <th key='email'>email</th>
-        </tr>
-      </thead>
+            <span className='role'>{user.role}</span>
+          </Link>
+        </li>
+      )
+    }
 
-      <tbody>
-        {data.map((item, index) => (
-          <TableRow key={item.email} item={item} index={index} /> // TODO need to use the key?
-        ))}
-      </tbody>
-    </table>
-  )
-}
-
-function TableRow ({ item, index }) {
-  return (
-    <tr>
-      <TableDataCell id={item.id} content={item.firstName} dataCell='First name' />
-      <TableDataCell id={item.id} content={item.lastName} dataCell='Last name' />
-      <TableDataCell id={item.id} content={item.email} dataCell='email' />
-    </tr>
-  )
-}
-
-function TableDataCell ({ id, dataCell, content }) {
-  return (
-    <td data-cell={dataCell}>
-      <Link to={`/settings/user/${id}`}>
-        {content}
-      </Link>
-    </td>
-  )
+    return (
+      <div className='users-list'>
+        <ol>
+          {listItems}
+        </ol>
+      </div>
+    )
+  }
 }

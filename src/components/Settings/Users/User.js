@@ -113,6 +113,7 @@ export default class User extends Component {
 
   render () {
     if (this.state.userData && this.state.userData.id) {
+      let deletedData
       let deleteButton
       if (this.state.userData.deletedAt) {
         deleteButton = (
@@ -123,6 +124,17 @@ export default class User extends Component {
           >
             Restore
           </button>
+        )
+
+        deletedData = (
+          <tr>
+            <th scope='row'>
+              <span>Deleted</span>
+            </th>
+            <td data-cell='deletedAt'>
+              <span>{this.state.userData.deletedAt}</span>
+            </td>
+          </tr>
         )
       } else {
         deleteButton = (
@@ -138,117 +150,148 @@ export default class User extends Component {
 
       return (
         <div>
-          <div>
-            <button
-              type='button'
-              onClick={linkEvent(this, handleUpdate)}
-            >
-              Save
-            </button>
+          <div className='route-header'>
+            <div>
+              <button
+                type='button'
+                onClick={linkEvent(this, handleUpdate)}
+              >
+                Save
+              </button>
+            </div>
 
-            <button
-              type='button'
-              name='restore'
-              onClick={linkEvent(this, handlePasswordReset)}
-            >
-              Reset password
-            </button>
+            <div>
+              <button
+                type='button'
+                name='restore'
+                onClick={linkEvent(this, handlePasswordReset)}
+              >
+                Reset password
+              </button>
 
-            {deleteButton}
+              {deleteButton}
+            </div>
           </div>
 
-          <table>
-            <caption>
-              User data
-            </caption>
+          <div className='route-body'>
+            <table className='user-table'>
+              <caption>
+                <span className='h3'>User data</span>
+              </caption>
 
-            <tbody>
-              <tr>
-                <th scope='row'>id</th>
-                <td data-cell='id'>{this.state.userData.id}</td>
-              </tr>
-              <tr>
-                <th scope='row'>handle</th>
-                <td data-cell='handle'>
-                  <input
-                    name='handle'
-                    type='text'
-                    spellCheck='false'
-                    autoComplete='off'
-                    value={this.state.userData.handle}
-                    onInput={linkEvent(this, handleInputChange)}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th scope='row'>email</th>
-                <td data-cell='email'>
-                  <input
-                    name='email'
-                    type='text'
-                    spellCheck='false'
-                    autoComplete='off'
-                    value={this.state.userData.email}
-                    onInput={linkEvent(this, handleInputChange)}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th scope='row'>role</th>
-                {/* TODO select */}
-                <td>{this.state.userData.role}</td>
-              </tr>
-              <tr>
-                <th scope='row'>createdAt</th>
-                <td data-cell='createdAt'>{this.state.userData.createdAt}</td>
-              </tr>
-              <tr>
-                <th scope='row'>updatedAt</th>
-                <td data-cell='updatedAt'>{this.state.userData.updatedAt}</td>
-              </tr>
-              <tr>
-                <th scope='row'>deletedAt</th>
-                <td data-cell='deletedAt'>{this.state.userData.deletedAt}</td>
-              </tr>
-              <tr>
-                <th scope='row'>firstName</th>
-                <td data-cell='firstName'>
-                  <input
-                    name='firstName'
-                    type='text'
-                    spellCheck='true'
-                    autoComplete='on'
-                    value={this.state.userData.firstName}
-                    onInput={linkEvent(this, handleInputChange)}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th scope='row'>lastName</th>
-                <td data-cell='lastName'>
-                  <input
-                    name='lastName'
-                    type='text'
-                    spellCheck='true'
-                    autoComplete='on'
-                    value={this.state.userData.lastName}
-                    onInput={linkEvent(this, handleInputChange)}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <th scope='row'>metadata</th>
-                <td data-cell='metadata'>
-                  <Metadata
-                    lastError={this.state.lastError}
-                    updateLastError={this.updateLastError}
-                    sortedMetadata={this.state.sortedMetadata}
-                    updateSortedMetadata={this.updateSortedMetadata}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              <tbody>
+                <tr>
+                  <th scope='row'>
+                    <span>ID</span>
+                  </th>
+                  <td data-cell='id'>
+                    <span>{this.state.userData.id}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope='row'>
+                    <span>Handle</span>
+                  </th>
+                  <td data-cell='handle'>
+                    <input
+                      name='handle'
+                      type='text'
+                      spellCheck='false'
+                      autoComplete='off'
+                      value={this.state.userData.handle}
+                      onInput={linkEvent(this, handleInputChange)}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th scope='row'>
+                    <span>email</span>
+                  </th>
+                  <td data-cell='email'>
+                    <input
+                      name='email'
+                      type='text'
+                      spellCheck='false'
+                      autoComplete='off'
+                      value={this.state.userData.email}
+                      onInput={linkEvent(this, handleInputChange)}
+                    />
+                  </td>
+                </tr>
+
+                <tr>
+                  <th scope='row'>
+                    <span>Role</span>
+                  </th>
+                  {/* TODO select */}
+                  <td>{this.state.userData.role}</td>
+                </tr>
+
+                <tr>
+                  <th scope='row'>
+                    <span>Created</span>
+                  </th>
+                  <td data-cell='createdAt'>
+                    <span>{this.state.userData.createdAt}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope='row'>
+                    <span>Updated</span>
+                  </th>
+                  <td data-cell='updatedAt'>
+                    <span>{this.state.userData.updatedAt}</span>
+                  </td>
+                </tr>
+
+                {deletedData}
+
+                <tr>
+                  <th scope='row'>
+                    <span>First name</span>
+                  </th>
+                  <td data-cell='firstName'>
+                    <input
+                      name='firstName'
+                      type='text'
+                      spellCheck='true'
+                      autoComplete='on'
+                      value={this.state.userData.firstName}
+                      onInput={linkEvent(this, handleInputChange)}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th scope='row'>
+                    <span>Last name</span>
+                  </th>
+                  <td data-cell='lastName'>
+                    <input
+                      name='lastName'
+                      type='text'
+                      spellCheck='true'
+                      autoComplete='on'
+                      value={this.state.userData.lastName}
+                      onInput={linkEvent(this, handleInputChange)}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <th scope='row'>
+                    <span>Metadata</span>
+                  </th>
+                  <td data-cell='metadata'>
+                    <Metadata
+                      lastError={this.state.lastError}
+                      updateLastError={this.updateLastError}
+                      sortedMetadata={this.state.sortedMetadata}
+                      updateSortedMetadata={this.updateSortedMetadata}
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       )
     }
@@ -399,5 +442,5 @@ async function deleteUser (id) {
 }
 
 async function handleRestoreUser (instance) {
-  // TODO create endpoint
+  // TODO send an update with null deletedAt
 }

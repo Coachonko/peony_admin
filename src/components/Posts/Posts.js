@@ -117,7 +117,7 @@ export default class Posts extends Component {
       let settings = null
       if (this.state.listData.length > 0) {
         settings = (
-          <div className='posts-settings'>
+          <div className='route-settings'>
             <div>
               <label for='sort-order'>sort order</label>
               <select

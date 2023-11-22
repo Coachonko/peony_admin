@@ -31,7 +31,7 @@ export default class Nav extends Component {
         userMenu = (
           <ul>
             <li>
-              <Link to={`settings/user/${this.props.currentUserData.id}`}>
+              <Link to={`/settings/users/user/${this.props.currentUserData.id}`}>
                 Your profile
               </Link>
             </li>
