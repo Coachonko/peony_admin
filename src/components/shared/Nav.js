@@ -54,7 +54,9 @@ export default class Nav extends Component {
       return (
         <nav className='main-nav'>
           <div className='header'>
-            <span className='h3'>peony</span>
+            <Link to='/' className='peony'>
+              <span className='h3'>peony</span>
+            </Link>
           </div>
 
           <div className='body'>
