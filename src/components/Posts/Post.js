@@ -181,13 +181,41 @@ export default class Post extends Component {
 
       let settingsMenu
       if (this.state.settings === true) {
-        const { title, subtitle, excerpt, handle, featured, visibility } = this.state.postData
+        const { title, subtitle, excerpt, handle, featured, visibility, postType } = this.state.postData
+
+        let canFeature
+        if (postType === 'post') {
+          canFeature = (
+            <div className='form-group checkbox-group'>
+              <input
+                className='checkbox-input'
+                name='featured'
+                id='featured'
+                type='checkbox'
+                checked={featured}
+                onChange={linkEvent(this, handleSettings)}
+              />
+              <label for='featured'>Feature this post</label>
+            </div>
+          )
+        }
+
         settingsMenu = (
-          <div className='settings-menu'>
-            <h4>Settings</h4>
+          <div className='editor-settings'>
+            <div className='header'>
+              <span className='h4'>{postType.charAt(0).toUpperCase() + postType.slice(1)} settings</span>
+              <button
+                className='settings-toggle'
+                title='Settings'
+                type='button'
+                onClick={linkEvent(this, toggleSettings)}
+              >
+                <CircumIcon name='square_chev_right' />
+              </button>
+            </div>
             <form>
               <div className='form-group'>
-                <label for='title'>title</label>
+                <label for='title'>Title</label>
                 <input
                   name='title'
                   id='title'
@@ -199,7 +227,7 @@ export default class Post extends Component {
                 />
               </div>
               <div className='form-group'>
-                <label for='subtitle'>subtitle</label>
+                <label for='subtitle'>Subtitle</label>
                 <input
                   name='subtitle'
                   id='subtitle'
@@ -211,8 +239,8 @@ export default class Post extends Component {
                 />
               </div>
               <div className='form-group'>
-                <label for='excerpt'>excerpt</label>
-                <input
+                <label for='excerpt'>Excerpt</label>
+                <textarea
                   name='excerpt'
                   id='excerpt'
                   type='text'
@@ -223,7 +251,7 @@ export default class Post extends Component {
                 />
               </div>
               <div className='form-group'>
-                <label for='handle'>handle</label>
+                <label for='handle'>Handle</label>
                 <input
                   name='handle'
                   id='handle'
@@ -234,27 +262,18 @@ export default class Post extends Component {
                   onInput={linkEvent(this, handleSettings)}
                 />
               </div>
-              <div className='form-group'>
-                <label for='featured'>featured</label>
-                <input
-                  name='featured'
-                  id='featured'
-                  type='checkbox'
-                  checked={featured}
-                  onChange={linkEvent(this, handleSettings)}
-                />
-              </div>
+              {canFeature}
               <div className='form-group'>
                 {/* TODO make toggle */}
-                <label for='visibility'>visibility</label>
+                <label for='visibility'>Visibility</label>
                 <select
                   name='visibility'
                   id='visibility'
                   value={visibility}
                   onChange={linkEvent(this, handleSettings)}
                 >
-                  <option value='public'>public</option>
-                  <option value='paid'>paid</option>
+                  <option value='public'>Public</option>
+                  <option value='paid'>Paid</option>
                 </select>
               </div>
               {/*
@@ -294,35 +313,42 @@ export default class Post extends Component {
       }
 
       return (
-        <div className='editor'>
-          <div className='editor-header'>
-            <button
-              className='save-button'
-              type='button'
-              onClick={linkEvent(this, saveHandler)}
-            >
-              <CircumIcon name='floppy_disk' />
-            </button>
-            <div className='settings-right'>
-              {statusButton}
-              <button
-                className='settings-toggle'
-                title='Settings'
-                type='button'
-                onClick={linkEvent(this, toggleSettings)}
-              >
-                <CircumIcon name='square_more' />
-              </button>
+        <>
+          <div className='post-editor'>
+            <div className='editor-row'>
+              <div className='editor-header'>
+                <button
+                  className='save-button'
+                  type='button'
+                  onClick={linkEvent(this, saveHandler)}
+                >
+                  <CircumIcon name='floppy_disk' />
+                </button>
+                <div className='settings-right'>
+                  {statusButton}
+                  <button
+                    className='settings-toggle'
+                    title='Settings'
+                    type='button'
+                    onClick={linkEvent(this, toggleSettings)}
+                    disabled={this.state.settings}
+                  >
+                    <CircumIcon name='square_chev_left' />
+                  </button>
+                </div>
+              </div>
+
+              <div className='editor-body'>
+                <JoditWrapper
+                  value={this.state.postData.content}
+                  updateValue={this.updateContent}
+                />
+              </div>
             </div>
+
+            {settingsMenu}
           </div>
-
-          <JoditWrapper
-            value={this.state.postData.content}
-            updateValue={this.updateContent}
-          />
-
-          {settingsMenu}
-        </div>
+        </>
       )
     }
   }

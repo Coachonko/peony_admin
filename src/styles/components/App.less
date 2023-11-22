@@ -1,7 +1,5 @@
 #root {
-  // components
-  @import 'Alerts.less';
-  @import 'Nav.less';
+  // routes
   @import 'Routes.less';
   @import 'Posts.less';
   @import 'Post.less';
@@ -9,12 +7,16 @@
   @import 'Settings.less';
   // shared
   @import 'mixins.less';
+  @import 'Alerts.less';
+  @import 'Nav.less';
+  @import 'Metadata.less';
 
   display: flex;
   height: 100%;
 
   select,
-  button {
+  button,
+  input {
     padding-top: 5px;
     padding-bottom: 5px;
     padding-right: 10px;

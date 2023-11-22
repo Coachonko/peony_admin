@@ -1,5 +1,7 @@
 import { linkEvent } from 'inferno'
 
+import { CircumIcon } from 'circum-icons-inferno'
+
 export default function Metadata ({ lastError, updateLastError, sortedMetadata, updateSortedMetadata }) {
   const metadataGroup = []
   for (let i = 0; i < sortedMetadata.length; i++) {
@@ -7,8 +9,9 @@ export default function Metadata ({ lastError, updateLastError, sortedMetadata, 
     const key = Object.keys(item)[0]
     const value = Object.values(item)[0]
     metadataGroup.push(
-      <div>
+      <div className='metadata-group'>
         <input
+          className='metadata-input'
           name={key}
           type='text'
           spellCheck='false'
@@ -18,6 +21,7 @@ export default function Metadata ({ lastError, updateLastError, sortedMetadata, 
           onFocusOut={linkEvent({ updateLastError, sortedMetadata, i }, handleMetadataKeyValidation)}
         />
         <input
+          className='metadata-input'
           name={value}
           type='text'
           spellCheck='false'
@@ -26,11 +30,12 @@ export default function Metadata ({ lastError, updateLastError, sortedMetadata, 
           onInput={linkEvent({ sortedMetadata, updateSortedMetadata, i }, handleMetadataValueChange)}
         />
         <button
+          className='pair-remove'
           name={key}
           type='button'
           onClick={linkEvent({ sortedMetadata, updateSortedMetadata, i }, handleRemoveMetadataPair)}
         >
-          Remove
+          <CircumIcon name='trash' />
         </button>
       </div>
     )
@@ -40,10 +45,11 @@ export default function Metadata ({ lastError, updateLastError, sortedMetadata, 
       {metadataGroup}
       <div>
         <button
+          className='pair-add'
           type='button'
           onClick={linkEvent({ sortedMetadata, updateSortedMetadata }, handleAddMetadataPair)}
         >
-          Add
+          <CircumIcon name='square_plus' />
         </button>
       </div>
     </>

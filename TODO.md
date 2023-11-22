@@ -12,3 +12,6 @@
 - Editor should upload images to Garage, needs a gallery extension for showcases of many pictures.
 - Responsiveness
 - Accessibility
+- Style elements uniformly:
+  - select
+  - input checkbox

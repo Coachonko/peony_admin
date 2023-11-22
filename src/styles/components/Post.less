@@ -1,16 +1,100 @@
-.editor-header {
+.post-editor {
   display: flex;
-  justify-content: space-between;
+  height: 100%;
 
-  .save-button,
-  .settings-toggle {
-    border: none;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .settings-right {
+  .editor-row {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    width: 100%;
   }
+
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    height: 80px;
+
+    .settings-right {
+      display: flex;
+      justify-content: center;
+    }
+  }
+}
+
+.editor-settings {
+  border-left: 1px solid @white;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  flex-shrink: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 600px;
+  background-color: @black;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 40px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    height: 80px;
+
+    .h4 {
+      display: flex;
+      justify-content: center;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+
+    &.checkbox-group {
+      flex-direction: row;
+
+      .checkbox-input {
+        appearance: none;
+        margin-right: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 24px;
+        height: 24px;
+        background-color: @black;
+        cursor: pointer;
+
+        &::before {
+          content: "\2713"; // Unicode checkmark character
+          color: transparent;
+          transition: 0.2s;
+        }
+
+        &:checked::before {
+          color: @green;
+        }
+      }
+    }
+
+
+    input,
+    textarea,
+    select {
+      margin-bottom: 20px;
+
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+  }
+}
+
+.save-button,
+.settings-toggle {
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
 }
