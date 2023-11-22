@@ -1,5 +1,7 @@
 # TODO
 
+## Functionality
+
 - Ensure when fetch gets error 401 responses, remove token from localStorage and redirect.
 - Consider checking token `exp` before sending requests to the server
   Why: Solves problems related to expired tokens (it does not handle invalidated tokens).
@@ -10,8 +12,15 @@
   server are `/login` and NoMatch.
   Solution: API route with tinyhttp, put jwt into cookie and give to client.
 - Editor should upload images to Garage, needs a gallery extension for showcases of many pictures.
+- Fix bugs:
+  - When session expires (or server dies?), infinite redirects between protected route and login.
+
+## Design
+
 - Responsiveness
 - Accessibility
-- Style elements uniformly:
-  - select
-  - input checkbox
+- Style elements uniformly. Global app styles go in `App.less`
+- Fix warnings:
+  - Buttons must have text
+- Fix bugs:
+  - Tables move when they shouldn't
