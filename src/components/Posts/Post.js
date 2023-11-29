@@ -66,6 +66,7 @@ export default class Post extends Component {
       this.setState({
         readyForEditing: true,
         postData: {
+          status: 'draft',
           title: '',
           subtitle: '',
           excerpt: '',
@@ -171,12 +172,28 @@ export default class Post extends Component {
 
     if (this.state.readyForEditing === true) {
       let statusButton
-      if (this.props.match.params.id) {
-        statusButton = <button type='button'>Update</button>
-      /* TODO update menu: radio button published or unpublished, confirm and cancel buttons */
-      } else {
-        statusButton = <button type='button'>Publish</button>
+      if (this.state.postData.status) {
+        if (this.state.postData.status === 'published' || this.state.postData.status === 'scheduled') {
+          statusButton = (
+            <button type='button'>
+              Update
+            </button>
+          )
+        // HIGH PRIORITY TODO
+          /* TODO update menu: radio button published or unpublished, confirm and cancel buttons */
+        }
+        if (this.state.postData.status === 'draft') {
+          statusButton = (
+            <button
+              name='status'
+              type='button'
+              onClick={linkEvent(this, handlePublish)}
+            >
+              Publish
+            </button>
+          )
         /* TODO publish menu: radio buttons publish now or schedule, confirm and delete buttons */
+        }
       }
 
       let settingsMenu
@@ -299,6 +316,7 @@ export default class Post extends Component {
                   sortedMetadata={this.state.sortedMetadata}
                   updateSortedMetadata={this.updateSortedMetadata}
                 />
+                {/* TODO delete button */}
               </div>
             </form>
           </div>
@@ -540,6 +558,16 @@ function handleSettings (instance, event) {
       }
     })
   }
+}
+
+async function handlePublish (instance) {
+  instance.setState({
+    postData: {
+      ...instance.state.postData,
+      status: 'published'
+    }
+  })
+  await handleUpdate(instance)
 }
 
 async function handleDelete (instance) {

@@ -34,14 +34,18 @@ class Login extends Component {
     }
 
     return (
-      <div role='form' id='login-form'>
-        <h1>Login</h1>
+      <div role='form' className='login-form' id='login-form'>
+        <div className='background'>
+          <div className='shape-one' />
+          <div className='shape-two' />
+        </div>
         <form>
+          <h1>peony</h1>
           <input
             type='email'
             id='email'
             autoComplete='email'
-            placeholder='heavy_lifter@coachonko.com'
+            placeholder='email'
             title='Enter your email address'
             required
             value={this.state.email}
@@ -51,7 +55,7 @@ class Login extends Component {
             type='password'
             id='password'
             autoComplete='current-password'
-            placeholder='very-secret-password'
+            placeholder='password'
             title='Password must be at leats 10 characters long, using a password manager is recommended.'
             minLength='10'
             required
@@ -63,7 +67,7 @@ class Login extends Component {
             onClick={linkEvent(this, handleSubmit)}
             disabled={this.state.isSubmitting}
           >
-            Log in
+            <span className='h5'>Log in</span>
           </button>
         </form>
       </div>

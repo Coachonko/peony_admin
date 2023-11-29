@@ -17,6 +17,7 @@
   - When session expires (or server dies?), infinite redirects between protected route and login.
 - Handle errors:
   - Display app errors using the Alerts component.
+- Replace jodit editor with something better.
 
 ## Design
 
