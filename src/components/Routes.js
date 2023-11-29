@@ -143,6 +143,7 @@ class ProtectedRoute extends Component {
   }
 
   notAuthorized () {
+    unsetToken()
     this.setState({ isNotAuthorized: true })
   }
 
