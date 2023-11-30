@@ -3,7 +3,7 @@ import { NavLink, Link } from 'inferno-router'
 import { CircumIcon } from 'circum-icons-inferno'
 
 import { config } from '../../../config'
-import { appendToken, getToken, unsetToken } from '../../utils/auth'
+import { appendToken, getToken } from '../../utils/auth'
 
 export default class Nav extends Component {
   constructor (props) {
@@ -27,6 +27,7 @@ export default class Nav extends Component {
   render () {
     if (this.props.currentUserData) {
       let userMenu
+      // TODO close userMenu when user clicks outside of userMenu
       if (this.state.userMenu === true) {
         userMenu = (
           <ul>
@@ -128,12 +129,11 @@ async function handleLogout (instance, event) {
     if (!response.ok) {
       const data = await response.json()
       instance.setState({ peonyError: data })
-      if (data.code && data.code === 401) { // TODO why not unsetToken on 401?
-        unsetToken()
+      if (data.code && data.code === 401) {
         instance.setState({ isLoggedOut: true })
       }
+      // TODO handle other error codes if necessary
     } else {
-      unsetToken()
       instance.setState({ isLoggedOut: true })
     }
   } catch (error) {

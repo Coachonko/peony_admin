@@ -62,6 +62,7 @@ export default class Posts extends Component {
       endpoint = 'posts'
     }
 
+    // TODO query parameters
     const token = getToken()
     const requestHeaders = new Headers()
     appendToken(token, requestHeaders)

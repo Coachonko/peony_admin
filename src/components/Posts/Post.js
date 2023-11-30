@@ -1,4 +1,4 @@
-import { Component, linkEvent } from 'inferno'
+import { Component, linkEvent, createRef } from 'inferno'
 import { Redirect } from 'inferno-router'
 
 import { config } from '../../../config'
@@ -6,9 +6,7 @@ import { getToken, appendToken } from '../../utils/auth'
 import { isPeonyError } from '../../utils/peony'
 import { makeCancelable } from '../../utils/promises'
 
-import JoditWrapper from './JoditWrapper'
 import { Metadata } from '../shared'
-
 import { CircumIcon } from 'circum-icons-inferno'
 
 export default class Post extends Component {
@@ -183,6 +181,8 @@ export default class Post extends Component {
               type='button'
               name='delete'
               onClick={linkEvent(this, handleDelete)}
+              // TODO don't immediately delete, open modal to confirm choice, then delete.
+              // TODO when post is deleted, redirect to /posts
             >
               <CircumIcon name='trash' />
               Delete
@@ -688,4 +688,155 @@ async function deletePost (id) {
   } catch (error) {
     return error
   }
+}
+
+/*
+*
+* ListBox
+*
+*/
+
+// availableItems: object containing user or post_tag objects
+// selectedItems: array of id, subset of availableItems
+// updateSelectedItems: function that receives an array of id, subset of availableItems
+class ListBox extends Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      inputValue: ''
+    }
+
+    this.handleInputChange = this.handleInputChange.bind(this)
+    this.handleInputClick = this.handleInputClick.bind(this)
+  }
+
+  handleInputChange (newInputValue) {
+    this.setState({ inputValue: newInputValue })
+  }
+
+  handleInputClick (itemId) {
+    const { selectedItems, updateSelectedItems } = this.props
+
+    let newSelectedItems
+    if (selectedItems.includes(itemId)) {
+      newSelectedItems = selectedItems.filter((id) => id !== itemId)
+    } else {
+      newSelectedItems = [...selectedItems, itemId]
+    }
+
+    updateSelectedItems(newSelectedItems)
+  }
+
+  componentDidUpdate (lastProps) {
+    // Reset the input value when availableItems changes
+    if (lastProps.availableItems !== this.props.availableItems) {
+      this.setState({ inputValue: '' })
+    }
+  }
+
+  render () {
+    const filteredItems = this.props.availableItems.filter((item) =>
+      item.name.toLowerCase().includes(this.state.inputValue.toLowerCase())
+    )
+
+    // Should display currently selected items (selectedItems)
+    // Should autocomplete from user input
+    // Should show a list of available items (availableItems.[i].name)
+    // onChange updateSelectedItems
+
+    return (
+      <div className='listbox-items'>
+        {/* Display currently selected items */}
+        <div>
+          <strong>Selected Items:</strong>
+          {this.props.selectedItems.map((itemId) => (
+            <div key={itemId} onClick={() => this.handleItemClick(itemId)}>
+              {this.props.availableItems.find((item) => item.id === itemId).name}
+            </div>
+          ))}
+        </div>
+
+        {/* Autocomplete from user input */}
+        <input
+          type='text'
+          placeholder='Type to filter available items...'
+          value={this.state.inputValue}
+          onChange={this.handleInputChange}
+        />
+
+        {/* Show a list of available items */}
+        <div>
+          <strong>Available Items:</strong>
+          {filteredItems.map((item) => (
+            <div key={item.id} onClick={() => this.handleItemClick(item.id)}>
+              {item.name}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+}
+
+/*
+*
+* JoditWrapper
+*
+*/
+
+const { JoditEditor } = (await import('jodit-inferno'))
+const { Jodit } = await import('jodit-inferno')
+
+class JoditWrapper extends Component {
+  constructor (props) {
+    super(props)
+
+    this.editor = createRef()
+    this.handleBlur = this.handleBlur.bind(this)
+  }
+
+  handleBlur (newValue) {
+    this.props.updateValue(newValue)
+  }
+
+  render () {
+    return (
+      <JoditEditor
+        className='jodit-editor'
+        config={joditConfig}
+        ref={this.editor}
+        value={this.props.value}
+        onBlur={this.handleBlur}
+      />
+    )
+  }
+}
+
+const joditConfig = {
+  inline: true,
+  toolbar: false,
+  toolbarInline: true,
+  toolbarInlineForSelection: true,
+  popup: {
+    selection: Jodit.atom([
+      'bold',
+      'italic',
+      'underline',
+      'strikethrough',
+      'superscript',
+      'subscript',
+      'ul',
+      'ol',
+      'paragraph',
+      'table',
+      'link',
+      'spellcheck'
+    ])
+  },
+  showXPathInStatusbar: false,
+  showCharsCounter: true,
+  showWordsCounter: true,
+  addNewLine: false,
+  theme: 'dark' // TODO customize https://xdsoft.net/jodit/examples/theme/dark.html
 }
