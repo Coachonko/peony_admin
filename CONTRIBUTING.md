@@ -34,7 +34,6 @@ Please follow these standards
   - `componentDidUpdate`
   - `componentWillUnmount`
   - `shouldComponentUpdate`
-- Use `linkEvent` wherever possible.
 - Use async/await instead of promise methods.
 - Fetch should always return the response object or an error object in case of error:
   - When fetch returns an PeonyError, that is stored in the component state as peonyError.
