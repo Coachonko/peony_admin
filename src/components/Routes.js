@@ -232,6 +232,12 @@ class ProtectedRoute extends Component {
 
     // TODO when error fetching, because server offline, show an error and something
 
+    // Wait for current user data to become available: it is needed by Route components.
+    // TODO display loader?
+    if (this.state.currentUserData === null) {
+      return null
+    }
+
     return (
       <>
         <Nav
