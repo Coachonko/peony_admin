@@ -19,6 +19,10 @@
   - Display app errors using the Alerts component.
 - Replace jodit editor with something better.
 
+## Bugs
+
+- `You tried to redirect to the same route you're currently on: "/posts/post/075c60c2-dd1f-a002-d43b-4d8866808785undefined"` when saving a new post.
+
 ## Design
 
 - Responsiveness
