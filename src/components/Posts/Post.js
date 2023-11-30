@@ -24,12 +24,19 @@ export default class Post extends Component {
       settings: false,
       statusSettings: false,
       sortedMetadata: null,
-      postData: null
+      postData: null,
+      usersData: null,
+      postAuthors: [],
+      postTagData: null,
+      postTags: []
     }
 
     this.updateLastError = this.updateLastError.bind(this)
     this.updateSortedMetadata = this.updateSortedMetadata.bind(this)
     this.updateContent = this.updateContent.bind(this)
+
+    this.updateAuthors = this.updateAuthors.bind(this)
+    this.updateTags = this.updateTags.bind(this)
   }
 
   updateLastError (newLastError) {
@@ -48,6 +55,14 @@ export default class Post extends Component {
         content: newContent
       }
     })
+  }
+
+  updateAuthors (newAuthors) {
+    console.log(newAuthors)
+  }
+
+  updateTags (newTags) {
+    console.log(newTags)
   }
 
   async componentDidMount () {
@@ -76,9 +91,13 @@ export default class Post extends Component {
           metadata: {},
           postType: newPostType
         },
-        sortedMetadata: []
+        sortedMetadata: [],
+        postAuthors: [this.props.currentUserData.id]
       })
     }
+
+    this.gettingUsersData = makeCancelable(this.getUsersData())
+    await this.resolveGettingUsersData()
   }
 
   async componentDidUpdate () {
@@ -100,6 +119,9 @@ export default class Post extends Component {
   componentWillUnmount () {
     if (this.gettingPostData) {
       this.gettingPostData.cancel()
+    }
+    if (this.gettingUsersData) {
+      this.gettingUsersData.cancel()
     }
   }
 
@@ -147,14 +169,16 @@ export default class Post extends Component {
               this.setState({ lastError: data })
             }
           }
+          const authorArray = data.authors.map((item) => item.id)
           this.setState({
             isNew: false,
             readyForEditing: true,
-            sortedMetadata: metadataArray,
             postData: {
               ...data,
               metadata: parsedMetadata
-            }
+            },
+            sortedMetadata: metadataArray,
+            authors: authorArray
           })
         }
       }
@@ -163,6 +187,44 @@ export default class Post extends Component {
       this.setState({
         lastError: error
       })
+    }
+  }
+
+  async getUsersData () {
+    const token = getToken()
+    const requestHeaders = new Headers()
+    appendToken(token, requestHeaders)
+
+    // TODO include deleted users
+    try {
+      const response = await fetch(`${config.PEONY_ADMIN_API}/users`, {
+        method: 'GET',
+        headers: requestHeaders
+      })
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      return error
+    }
+  }
+
+  async resolveGettingUsersData () {
+    try {
+      const data = await this.gettingUsersData.promise
+      if (data instanceof Error) {
+        console.error(data)
+        this.setState({ lastError: data })
+      } else {
+        if (isPeonyError(data)) {
+          this.setState({ peonyError: data })
+        } else {
+          this.setState({ usersData: data })
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      this.setState({ lastError: error })
     }
   }
 
@@ -254,6 +316,7 @@ export default class Post extends Component {
               </>
             )
           }
+
           if (this.state.postData.status === 'draft') {
             // TODO this button publishes immediately without requiring user to press the save button.
             // For predictable behavior, any changes should only be applied when pressing the save button.
@@ -364,21 +427,29 @@ export default class Post extends Component {
                   <option value='paid'>Paid</option>
                 </select>
               </div>
-              {/*
-            TODO insert authors
-            require one author, default to current user /admin/auth 'GET'
-            accept multiple authors, list of users can be obtained /admin/users 'GET'
-            store in array to ensure order, allow sorting
-            no duplicates
-            delete button
-            */}
-              {/*
-            TODO insert tags
-            list of tags can be obtained /admin/tags 'GET'
-            store in array to ensure order, allow sorting
-            no duplicates
-            delete button
-            */}
+
+              <div className='form-group'>
+                <ListBox
+                  label='Authors'
+                  name='authors'
+                  itemType='user'
+                  availableItems={this.state.usersData}
+                  selectedItems={this.state.authors}
+                  updateSelectedItems={this.updateAuthors}
+                />
+              </div>
+
+              <div className='form-group'>
+                <ListBox
+                  label='Tags'
+                  name='post-tags'
+                  itemType='postTag'
+                  availableItems={this.state.postTagData}
+                  selectedItems={this.state.tags}
+                  updateSelectedItems={this.updateTags}
+                />
+              </div>
+
               <div className='form-group'>
                 <label for='metadata'>metadata</label>
                 <Metadata
@@ -696,8 +767,11 @@ async function deletePost (id) {
 *
 */
 
-// availableItems: object containing user or post_tag objects
-// selectedItems: array of id, subset of availableItems
+// name: string to set the name attribute of input element
+// label : string to set the label content of the input element
+// itemType: either user or postTag
+// availableItems: object containing user or postTag objects
+// selectedItems: array of ids, subset of availableItems
 // updateSelectedItems: function that receives an array of id, subset of availableItems
 class ListBox extends Component {
   constructor (props) {
@@ -736,43 +810,73 @@ class ListBox extends Component {
   }
 
   render () {
+    if (!this.props.availableItems) {
+      return null
+    }
+
+    let itemField
+    if (this.props.itemType === 'user') {
+      itemField = 'email'
+    }
+    if (this.props.itemType === 'postTag') {
+      itemField = 'title'
+    }
+
     const filteredItems = this.props.availableItems.filter((item) =>
-      item.name.toLowerCase().includes(this.state.inputValue.toLowerCase())
+      item[itemField].toLowerCase().includes(this.state.inputValue.toLowerCase())
     )
 
-    // Should display currently selected items (selectedItems)
-    // Should autocomplete from user input
-    // Should show a list of available items (availableItems.[i].name)
-    // onChange updateSelectedItems
+    const selectedItems = []
+    for (const itemId of this.props.selectedItems) {
+      // Find the corresponding item in availableItems based on item ID
+      for (const item of this.props.availableItems) {
+        if (item.id === itemId) {
+          selectedItems.push(
+            <div className='selected-item' key={itemId}>
+              {item[itemField]}
+              <button
+                type='button'
+                className='remove'
+                onClick={() => this.handleInputClick(itemId)}
+              >
+                <CircumIcon name='trash' />
+              </button>
+            </div>
+          )
+          break
+        }
+      }
+    }
+
+    const availableItems = filteredItems.map((item) => (
+      <div
+        className='available-item'
+        key={item.id}
+        onClick={() => this.handleInputClick(item.id)}
+      >
+        {item.name}
+      </div>
+    ))
 
     return (
       <div className='listbox-items'>
-        {/* Display currently selected items */}
         <div>
-          <strong>Selected Items:</strong>
-          {this.props.selectedItems.map((itemId) => (
-            <div key={itemId} onClick={() => this.handleItemClick(itemId)}>
-              {this.props.availableItems.find((item) => item.id === itemId).name}
-            </div>
-          ))}
+          <label for={this.props.name}>{this.props.label}</label>
+          {selectedItems}
         </div>
 
-        {/* Autocomplete from user input */}
+        {/* TODO autocomplete */}
         <input
+          name={this.props.name}
           type='text'
-          placeholder='Type to filter available items...'
+          placeholder='Filter'
           value={this.state.inputValue}
           onChange={this.handleInputChange}
         />
 
-        {/* Show a list of available items */}
         <div>
-          <strong>Available Items:</strong>
-          {filteredItems.map((item) => (
-            <div key={item.id} onClick={() => this.handleItemClick(item.id)}>
-              {item.name}
-            </div>
-          ))}
+          {/* TODO allow sorting */}
+          {availableItems}
         </div>
       </div>
     )
