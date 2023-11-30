@@ -434,7 +434,7 @@ export default class Post extends Component {
                   name='authors'
                   itemType='user'
                   availableItems={this.state.usersData}
-                  selectedItems={this.state.authors}
+                  selectedItems={this.state.postAuthors}
                   updateSelectedItems={this.updateAuthors}
                 />
               </div>
@@ -854,7 +854,7 @@ class ListBox extends Component {
         key={item.id}
         onClick={() => this.handleInputClick(item.id)}
       >
-        {item.name}
+        {item[itemField]}
       </div>
     ))
 
@@ -892,6 +892,8 @@ class ListBox extends Component {
 const { JoditEditor } = (await import('jodit-inferno'))
 const { Jodit } = await import('jodit-inferno')
 
+// value: content of the editor
+// updateValue: function used to update the content of the editor
 class JoditWrapper extends Component {
   constructor (props) {
     super(props)
