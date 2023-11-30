@@ -16,6 +16,7 @@ export default class Post extends Component {
     super(props)
 
     this.state = {
+      isNew: true,
       readyForEditing: false,
       isSubmitting: false,
       peonyError: null,
@@ -23,6 +24,7 @@ export default class Post extends Component {
       newPathname: null,
       hasUpdated: false,
       settings: false,
+      statusSettings: false,
       sortedMetadata: null,
       postData: null
     }
@@ -148,6 +150,7 @@ export default class Post extends Component {
             }
           }
           this.setState({
+            isNew: false,
             readyForEditing: true,
             sortedMetadata: metadataArray,
             postData: {
@@ -171,31 +174,87 @@ export default class Post extends Component {
     }
 
     if (this.state.readyForEditing === true) {
-      let statusButton
-      if (this.state.postData.status) {
-        if (this.state.postData.status === 'published' || this.state.postData.status === 'scheduled') {
-          statusButton = (
-            <button type='button'>
-              Update
-            </button>
-          )
-        // HIGH PRIORITY TODO
-          /* TODO update menu: radio button published or unpublished, confirm and cancel buttons */
-        }
-        if (this.state.postData.status === 'draft') {
-          statusButton = (
-            <button
-              name='status'
-              type='button'
-              onClick={linkEvent(this, handlePublish)}
-            >
-              Publish
-            </button>
-          )
-        /* TODO publish menu: radio buttons publish now or schedule, confirm and delete buttons */
+      // TODO move to component
+      let statusSettings
+      if (this.state.isNew === false) {
+        if (this.state.postData.status) {
+          // TODO use another status variable that is only updated when changes are saved
+          // this prevents the radio button to hide the menu when this.state.postData.status === 'draft'
+          if (this.state.postData.status === 'published' || this.state.postData.status === 'scheduled') {
+            let statusSettingsMenu
+            if (this.state.statusSettings === true) {
+              statusSettingsMenu = (
+                <div className='status-settings'>
+                  <fieldset>
+                    <legend>Update post status</legend>
+                    <div>
+                      <input
+                        type='radio'
+                        name='status'
+                        value='published'
+                        checked={this.state.postData.status === 'published'}
+                        onChange={linkEvent(this, handleSettings)}
+                      />
+                      <label for='published'>
+                        Published
+                        <span className='description'>
+                          Display this post publicly
+                        </span>
+                      </label>
+                    </div>
+
+                    <div>
+                      <input
+                        type='radio'
+                        name='status'
+                        value='draft'
+                        checked={this.state.postData.status === 'draft'}
+                        onChange={linkEvent(this, handleSettings)}
+                      />
+                      <label for='draft'>
+                        Draft
+                        <span className='description'>
+                          Revert this {this.state.postData.postType} to a private draft.
+                        </span>
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+              )
+            }
+
+            statusSettings = (
+              <>
+                <button
+                  name='status'
+                  type='button'
+                  onClick={linkEvent(this, toggleStatusSettings)}
+                >
+                  Update
+                </button>
+                {statusSettingsMenu}
+              </>
+            )
+          }
+          if (this.state.postData.status === 'draft') {
+            // TODO this button publishes immediately without requiring user to press the save button.
+            // For predictable behavior, any changes should only be applied when pressing the save button.
+            // Only allowed exception should be the delete button, which can show a confirmation dialogue.
+            statusSettings = (
+              <button
+                name='status'
+                type='button'
+                onClick={linkEvent(this, handlePublish)}
+              >
+                Publish
+              </button>
+            )
+            /* TODO publish menu: radio buttons publish now or schedule */
+          }
         }
       }
 
+      // TODO move settingsMenu to component
       let settingsMenu
       if (this.state.settings === true) {
         const { title, subtitle, excerpt, handle, featured, visibility, postType } = this.state.postData
@@ -316,7 +375,7 @@ export default class Post extends Component {
                   sortedMetadata={this.state.sortedMetadata}
                   updateSortedMetadata={this.updateSortedMetadata}
                 />
-                {/* TODO delete button */}
+                {/* TODO delete button, not shown when post is new, confirm dialogue */}
               </div>
             </form>
           </div>
@@ -342,8 +401,10 @@ export default class Post extends Component {
                 >
                   <CircumIcon name='floppy_disk' />
                 </button>
-                <div className='settings-right'>
-                  {statusButton}
+
+                <div className='settings'>
+                  {statusSettings}
+
                   <button
                     className='settings-toggle'
                     title='Settings'
@@ -534,6 +595,10 @@ async function updatePostData (postDataToSend, id) {
   } catch (error) {
     return error
   }
+}
+
+function toggleStatusSettings (instance) {
+  instance.setState({ statusSettings: !instance.state.statusSettings })
 }
 
 function toggleSettings (instance) {
