@@ -174,6 +174,23 @@ export default class Post extends Component {
     }
 
     if (this.state.readyForEditing === true) {
+      let deleteButton
+      if (this.state.isNew === false) {
+        deleteButton = (
+          <div className='form-group'>
+            <button
+              className='delete'
+              type='button'
+              name='delete'
+              onClick={linkEvent(this, handleDelete)}
+            >
+              <CircumIcon name='trash' />
+              Delete
+            </button>
+          </div>
+        )
+      }
+
       // TODO move to component
       let statusSettings
       if (this.state.isNew === false) {
@@ -232,6 +249,7 @@ export default class Post extends Component {
                 >
                   Update
                 </button>
+                {/* TODO allow post scheduling */}
                 {statusSettingsMenu}
               </>
             )
@@ -266,7 +284,6 @@ export default class Post extends Component {
               <input
                 className='checkbox-input'
                 name='featured'
-                id='featured'
                 type='checkbox'
                 checked={featured}
                 onChange={linkEvent(this, handleSettings)}
@@ -294,7 +311,6 @@ export default class Post extends Component {
                 <label for='title'>Title</label>
                 <input
                   name='title'
-                  id='title'
                   type='text'
                   spellCheck='true'
                   autoComplete='off'
@@ -306,7 +322,6 @@ export default class Post extends Component {
                 <label for='subtitle'>Subtitle</label>
                 <input
                   name='subtitle'
-                  id='subtitle'
                   type='text'
                   spellCheck='true'
                   autoComplete='off'
@@ -318,7 +333,6 @@ export default class Post extends Component {
                 <label for='excerpt'>Excerpt</label>
                 <textarea
                   name='excerpt'
-                  id='excerpt'
                   type='text'
                   spellCheck='true'
                   autoComplete='off'
@@ -330,7 +344,6 @@ export default class Post extends Component {
                 <label for='handle'>Handle</label>
                 <input
                   name='handle'
-                  id='handle'
                   type='text'
                   spellCheck='false'
                   autoComplete='off'
@@ -344,7 +357,6 @@ export default class Post extends Component {
                 <label for='visibility'>Visibility</label>
                 <select
                   name='visibility'
-                  id='visibility'
                   value={visibility}
                   onChange={linkEvent(this, handleSettings)}
                 >
@@ -375,7 +387,7 @@ export default class Post extends Component {
                   sortedMetadata={this.state.sortedMetadata}
                   updateSortedMetadata={this.updateSortedMetadata}
                 />
-                {/* TODO delete button, not shown when post is new, confirm dialogue */}
+                {deleteButton}
               </div>
             </form>
           </div>
