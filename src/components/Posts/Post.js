@@ -58,11 +58,11 @@ export default class Post extends Component {
   }
 
   updateAuthors (newAuthors) {
-    console.log(newAuthors)
+    this.setState({ postAuthors: newAuthors })
   }
 
   updateTags (newTags) {
-    console.log(newTags)
+    this.setState({ postTags: newTags })
   }
 
   async componentDidMount () {
@@ -170,6 +170,7 @@ export default class Post extends Component {
             }
           }
           const authorArray = data.authors.map((item) => item.id)
+          const postTagArray = data.tags.map((item) => item.id)
           this.setState({
             isNew: false,
             readyForEditing: true,
@@ -178,7 +179,8 @@ export default class Post extends Component {
               metadata: parsedMetadata
             },
             sortedMetadata: metadataArray,
-            authors: authorArray
+            postAuthors: authorArray,
+            postTags: postTagArray
           })
         }
       }
@@ -433,6 +435,7 @@ export default class Post extends Component {
                   label='Authors'
                   name='authors'
                   itemType='user'
+                  currentUserData={this.props.currentUserData}
                   availableItems={this.state.usersData}
                   selectedItems={this.state.postAuthors}
                   updateSelectedItems={this.updateAuthors}
@@ -765,14 +768,17 @@ async function deletePost (id) {
 *
 * ListBox
 *
+* Props
+* name: string to set the name attribute of input element
+* label : string to set the label content of the input element
+* itemType: either 'user' or 'postTag'
+* currentUserData: provide only when itemType is 'user'
+* availableItems: object containing 'user' or 'postTag' objects
+* selectedItems: array of ids, subset of availableItems
+* updateSelectedItems: function that receives an array of id, subset of availableItems
+*
 */
 
-// name: string to set the name attribute of input element
-// label : string to set the label content of the input element
-// itemType: either user or postTag
-// availableItems: object containing user or postTag objects
-// selectedItems: array of ids, subset of availableItems
-// updateSelectedItems: function that receives an array of id, subset of availableItems
 class ListBox extends Component {
   constructor (props) {
     super(props)
@@ -790,16 +796,14 @@ class ListBox extends Component {
   }
 
   handleInputClick (itemId) {
-    const { selectedItems, updateSelectedItems } = this.props
-
     let newSelectedItems
-    if (selectedItems.includes(itemId)) {
-      newSelectedItems = selectedItems.filter((id) => id !== itemId)
+    if (this.props.selectedItems.includes(itemId)) {
+      newSelectedItems = this.props.selectedItems.filter((id) => id !== itemId)
     } else {
-      newSelectedItems = [...selectedItems, itemId]
+      newSelectedItems = [...this.props.selectedItems, itemId]
     }
 
-    updateSelectedItems(newSelectedItems)
+    this.props.updateSelectedItems(newSelectedItems)
   }
 
   componentDidUpdate (lastProps) {
@@ -814,6 +818,11 @@ class ListBox extends Component {
       return null
     }
 
+    // If there is only one user, do not offer choice of authors.
+    if (this.props.itemType === 'user' && this.props.availableItems.length === 0) {
+      return null
+    }
+
     let itemField
     if (this.props.itemType === 'user') {
       itemField = 'email'
@@ -822,13 +831,16 @@ class ListBox extends Component {
       itemField = 'title'
     }
 
-    const filteredItems = this.props.availableItems.filter((item) =>
-      item[itemField].toLowerCase().includes(this.state.inputValue.toLowerCase())
-    )
+    const filteredItems = []
+    for (const item of this.props.availableItems) {
+      if (item[itemField].includes(this.state.inputValue)) {
+        filteredItems.push(item)
+      }
+    }
 
     const selectedItems = []
     for (const itemId of this.props.selectedItems) {
-      // Find the corresponding item in availableItems based on item ID
+      // Find the corresponding item in availableItems based on itemId
       for (const item of this.props.availableItems) {
         if (item.id === itemId) {
           selectedItems.push(
@@ -848,15 +860,19 @@ class ListBox extends Component {
       }
     }
 
-    const availableItems = filteredItems.map((item) => (
-      <div
-        className='available-item'
-        key={item.id}
-        onClick={() => this.handleInputClick(item.id)}
-      >
-        {item[itemField]}
-      </div>
-    ))
+    const availableItems = []
+    for (const item of filteredItems) {
+      availableItems.push(
+        <div
+          className='available-item'
+          key={item.id}
+          // TODO try to remove arrow function
+          onClick={() => this.handleInputClick(item.id)}
+        >
+          {item[itemField]}
+        </div>
+      )
+    }
 
     return (
       <div className='listbox-items'>
@@ -875,7 +891,10 @@ class ListBox extends Component {
         />
 
         <div>
-          {/* TODO allow sorting */}
+          {/* TODO
+          allow drag and drop sorting
+          hover for more information about items
+          */}
           {availableItems}
         </div>
       </div>
@@ -887,13 +906,15 @@ class ListBox extends Component {
 *
 * JoditWrapper
 *
+* Props
+* value: content of the editor
+* updateValue: function used to update the content of the editor
+*
 */
 
 const { JoditEditor } = (await import('jodit-inferno'))
 const { Jodit } = await import('jodit-inferno')
 
-// value: content of the editor
-// updateValue: function used to update the content of the editor
 class JoditWrapper extends Component {
   constructor (props) {
     super(props)
