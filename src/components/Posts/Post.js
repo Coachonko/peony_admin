@@ -240,17 +240,16 @@ export default class Post extends Component {
       if (this.state.isNew === false) {
         deleteButton = (
           <div className='form-group'>
-            <button
-              className='delete'
-              type='button'
-              name='delete'
-              onClick={linkEvent(this, handleDelete)}
-              // TODO don't immediately delete, open modal to confirm choice, then delete.
-              // TODO when post is deleted, redirect to /posts
-            >
-              <CircumIcon name='trash' />
-              Delete
-            </button>
+            <div className='delete'>
+              <span>Delete</span>
+              <button
+                type='button'
+                name='delete'
+                onClick={linkEvent(this, handleDelete)}
+              >
+                <CircumIcon name='trash' />
+              </button>
+            </div>
           </div>
         )
       }
