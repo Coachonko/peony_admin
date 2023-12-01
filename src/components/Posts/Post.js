@@ -268,7 +268,7 @@ export default class Post extends Component {
                 <div className='status-settings'>
                   <fieldset>
                     <legend>Update post status</legend>
-                    <div>
+                    <div className='radio-option'>
                       <input
                         type='radio'
                         name='status'
@@ -277,14 +277,14 @@ export default class Post extends Component {
                         onChange={linkEvent(this, handleSettings)}
                       />
                       <label for='published'>
-                        Published
-                        <span className='description'>
+                        <strong>Published</strong>
+                        <span>
                           Display this post publicly
                         </span>
                       </label>
                     </div>
 
-                    <div>
+                    <div className='radio-option'>
                       <input
                         type='radio'
                         name='status'
@@ -293,8 +293,8 @@ export default class Post extends Component {
                         onChange={linkEvent(this, handleSettings)}
                       />
                       <label for='draft'>
-                        Draft
-                        <span className='description'>
+                        <strong>Draft</strong>
+                        <span>
                           Revert this {this.state.postData.postType} to a private draft.
                         </span>
                       </label>
@@ -695,7 +695,7 @@ function toggleSettings (instance) {
 
 function handleSettings (instance, event) {
   const { name, value, checked, type } = event.target
-
+  console.log(name, value)
   if (type === 'checkbox') {
     instance.setState({
       postData: {
