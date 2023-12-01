@@ -820,7 +820,8 @@ class ListBox extends Component {
     }
 
     // If there is only one user, do not offer choice of authors.
-    if (this.props.itemType === 'user' && this.props.availableItems.length === 0) {
+    // Note: there is always at least one user in peony.
+    if (this.props.itemType === 'user' && this.props.availableItems.length === 1) {
       return null
     }
 
