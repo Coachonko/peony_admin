@@ -208,6 +208,7 @@ export default class User extends Component {
                     <span>email</span>
                   </th>
                   <td data-cell='email'>
+                    {/* TODO when value is empty, use original email for value */}
                     <input
                       name='email'
                       type='text'
@@ -382,7 +383,7 @@ async function submitUserData (userData, userId) {
 function handleInputChange (instance, event) {
   instance.setState({
     userData: {
-      ...instance.state.userdata,
+      ...instance.state.userData,
       [event.target.name]: event.target.value
     }
   })
