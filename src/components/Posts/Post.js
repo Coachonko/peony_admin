@@ -791,16 +791,17 @@ class ListBox extends Component {
     this.handleInputClick = this.handleInputClick.bind(this)
   }
 
-  handleInputChange (newInputValue) {
-    this.setState({ inputValue: newInputValue })
+  handleInputChange (event) {
+    this.setState({ inputValue: event.target.value })
   }
 
-  handleInputClick (itemId) {
+  handleInputClick (event) {
+    console.log(event.target.name)
     let newSelectedItems
-    if (this.props.selectedItems.includes(itemId)) {
-      newSelectedItems = this.props.selectedItems.filter((id) => id !== itemId)
+    if (this.props.selectedItems.includes(event.target.name)) {
+      newSelectedItems = this.props.selectedItems.filter((id) => id !== event.target.name)
     } else {
-      newSelectedItems = [...this.props.selectedItems, itemId]
+      newSelectedItems = [...this.props.selectedItems, event.target.name]
     }
 
     this.props.updateSelectedItems(newSelectedItems)
@@ -844,12 +845,13 @@ class ListBox extends Component {
       for (const item of this.props.availableItems) {
         if (item.id === itemId) {
           selectedItems.push(
-            <div className='selected-item' key={itemId}>
+            <div className='selected-item' key={item.id}>
               {item[itemField]}
               <button
                 type='button'
                 className='remove'
-                onClick={() => this.handleInputClick(itemId)}
+                name={item.id}
+                onClick={this.handleInputClick}
               >
                 <CircumIcon name='trash' />
               </button>
@@ -862,16 +864,25 @@ class ListBox extends Component {
 
     const availableItems = []
     for (const item of filteredItems) {
-      availableItems.push(
-        <div
-          className='available-item'
-          key={item.id}
-          // TODO try to remove arrow function
-          onClick={() => this.handleInputClick(item.id)}
-        >
-          {item[itemField]}
-        </div>
-      )
+      // do not list selected items
+      if (!this.props.selectedItems.includes(item.id)) {
+        availableItems.push(
+          <div
+            className='available-item'
+            key={item.id}
+          >
+            {item[itemField]}
+            <button
+              type='button'
+              className='add'
+              name={item.id}
+              onClick={this.handleInputClick}
+            >
+              <CircumIcon name='square_plus' />
+            </button>
+          </div>
+        )
+      }
     }
 
     return (
@@ -881,13 +892,12 @@ class ListBox extends Component {
           {selectedItems}
         </div>
 
-        {/* TODO autocomplete */}
         <input
           name={this.props.name}
           type='text'
           placeholder='Filter'
           value={this.state.inputValue}
-          onChange={this.handleInputChange}
+          onInput={this.handleInputChange}
         />
 
         <div>
