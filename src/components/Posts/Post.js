@@ -599,7 +599,9 @@ function preparePostWriteable (state) {
     content,
     handle,
     excerpt,
-    metadata: metadataObject
+    metadata: metadataObject,
+    authors: state.postAuthors,
+    tags: state.postTags
   }
 }
 
