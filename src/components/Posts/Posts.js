@@ -20,7 +20,6 @@ export default class Posts extends Component {
       sortBy: 'created_at',
       sortOrder: 'ascending',
       filterByStatus: null,
-      filterByFeatured: null,
       filterByVisibility: null,
       filterByAuthor: null,
       filterByTag: null
@@ -143,7 +142,6 @@ export default class Posts extends Component {
                 <option value='draft'>draft</option>
               </select>
             </div>
-            {/* TODO filterByFeatured */}
             <div>
               <label for='filter-by-visibility'>visibility</label>
               <select

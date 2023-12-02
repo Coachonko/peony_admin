@@ -86,7 +86,6 @@ export default class Post extends Component {
           subtitle: '',
           excerpt: '',
           handle: '',
-          featured: false,
           visibility: 'public',
           metadata: {},
           postType: newPostType
@@ -339,23 +338,7 @@ export default class Post extends Component {
       // TODO move settingsMenu to component
       let settingsMenu
       if (this.state.settings === true) {
-        const { title, subtitle, excerpt, handle, featured, visibility, postType } = this.state.postData
-
-        let canFeature
-        if (postType === 'post') {
-          canFeature = (
-            <div className='form-group checkbox-group'>
-              <input
-                className='checkbox-input'
-                name='featured'
-                type='checkbox'
-                checked={featured}
-                onChange={linkEvent(this, handleSettings)}
-              />
-              <label for='featured'>Feature this post</label>
-            </div>
-          )
-        }
+        const { title, subtitle, excerpt, handle, visibility, postType } = this.state.postData
 
         settingsMenu = (
           <div className='editor-settings'>
@@ -415,7 +398,6 @@ export default class Post extends Component {
                   onInput={linkEvent(this, handleSettings)}
                 />
               </div>
-              {canFeature}
               <div className='form-group'>
                 {/* TODO make toggle */}
                 <label for='visibility'>Visibility</label>
@@ -578,7 +560,6 @@ function preparePostWriteable (state) {
   // TODO add tag_id(s)
   const {
     status,
-    featured,
     visibility,
     title,
     subtitle,
@@ -591,7 +572,6 @@ function preparePostWriteable (state) {
 
   return {
     status,
-    featured,
     visibility,
     title,
     subtitle,
@@ -693,23 +673,14 @@ function toggleSettings (instance) {
 }
 
 function handleSettings (instance, event) {
-  const { name, value, checked, type } = event.target
+  const { name, value } = event.target
   console.log(name, value)
-  if (type === 'checkbox') {
-    instance.setState({
-      postData: {
-        ...instance.state.postData,
-        [name]: checked
-      }
-    })
-  } else {
-    instance.setState({
-      postData: {
-        ...instance.state.postData,
-        [name]: value
-      }
-    })
-  }
+  instance.setState({
+    postData: {
+      ...instance.state.postData,
+      [name]: value
+    }
+  })
 }
 
 async function handlePublish (instance) {
