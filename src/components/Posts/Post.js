@@ -97,6 +97,8 @@ export default class Post extends Component {
 
     this.gettingUsersData = makeCancelable(this.getUsersData())
     await this.resolveGettingUsersData()
+    this.gettingPostTagsData = makeCancelable(this.getPostTagsData())
+    await this.resolveGettingPostTagsData()
   }
 
   async componentDidUpdate () {
@@ -121,6 +123,9 @@ export default class Post extends Component {
     }
     if (this.gettingUsersData) {
       this.gettingUsersData.cancel()
+    }
+    if (this.gettingPostTagsData) {
+      this.gettingPostTagsData.cancel()
     }
   }
 
@@ -222,6 +227,34 @@ export default class Post extends Component {
         } else {
           this.setState({ usersData: data })
         }
+      }
+    } catch (error) {
+      console.error(error)
+      this.setState({ lastError: error })
+    }
+  }
+
+  async getPostTagsData () {
+    const token = getToken()
+    const requestHeaders = new Headers()
+    appendToken(token, requestHeaders)
+
+    const response = await fetch(`${config.PEONY_ADMIN_API}/post_tags`, {
+      method: 'GET',
+      headers: requestHeaders
+    })
+
+    const data = await response.json()
+    return data
+  }
+
+  async resolveGettingPostTagsData () {
+    try {
+      const data = await this.gettingPostTagsData.promise
+      if (isPeonyError(data)) {
+        this.setState({ peonyError: data })
+      } else {
+        this.setState({ postTagsData: data })
       }
     } catch (error) {
       console.error(error)
@@ -428,8 +461,8 @@ export default class Post extends Component {
                   label='Tags'
                   name='post-tags'
                   itemType='postTag'
-                  availableItems={this.state.postTagData}
-                  selectedItems={this.state.tags}
+                  availableItems={this.state.postTagsData}
+                  selectedItems={this.state.postTags}
                   updateSelectedItems={this.updateTags}
                 />
               </div>
